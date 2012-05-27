@@ -1,0 +1,32 @@
+These are the tests for the CreateQueensData functions.
+
+First, import the classes:
+
+	>>> from CreateQueensData import *
+
+Then, run the tests:
+
+	>>> showCoordConvert(1)
+	board size: 1 diagonals: 1
+	0,0 -> 0,0
+
+	>>> showCoordConvert(2)
+	board size: 2 diagonals: 3
+	0,0 -> 1,0
+	0,1 -> 0,1
+	1,0 -> 2,1
+	1,1 -> 1,2
+
+	>>> showCoordConvert(3)
+	board size: 3 diagonals: 5
+	0,0 -> 2,0
+	0,1 -> 1,1
+	0,2 -> 0,2
+	1,0 -> 3,1
+	1,1 -> 2,2
+	1,2 -> 1,3
+	2,0 -> 4,2
+	2,1 -> 3,3
+	2,2 -> 2,4
+
+end of tests.
