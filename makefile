@@ -2,7 +2,7 @@
 # Bill Ola Rasmussen
 
 CC=g++ 
-CC_FLAGS=-Wall
+CC_FLAGS=-Wall -std=gnu++0x -pedantic -Wextra
 
 # file names
 EXEC = solve

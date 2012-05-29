@@ -5,9 +5,10 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include "dlx.h"
 using namespace std;
 
-void readInput()
+Solver * readInput()
 {
 	string str;
 	while(cin.good())
@@ -23,6 +24,10 @@ void readInput()
   	if(ss.fail()){throw(runtime_error("fail reading constraint counts"));}
   	cout<<"primary constraints: "<<pri<<", "
   		<<"secondary constraints: "<<sec<<'\n';
+  		
+  	// todo: choose a solver
+  	DLX*solver=new DLX(pri,sec);
+  
   
 	while(cin.good())
 	{
@@ -34,6 +39,7 @@ void readInput()
 //  	cout<<str<<' '<<str.length()<<'\n';
 	// cout<< read n constraints todo
 	}
+	return solver;
 }
 
 // interface:
