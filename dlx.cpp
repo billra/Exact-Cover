@@ -59,52 +59,52 @@ using namespace std;
 // | of the algorithm proceeds exactly as before, so we will still call it algorithm DLX.
 
 
-Node*Node::Linkup(Node*rhs)
+Node*Node::LinkL(Node*p) // place node in same row before this item
 {
-	cout<<"attaching "<<rhs<<" to "<<this<<endl;
-	cout<<" "<<rhs->L<<endl;
-	rhs->L=this;
-	cout<<" "<<rhs->R<<" "<<this->R<<endl;
-	rhs->R=this->R;
-	cout<<" "<<rhs->R->L<<endl;
-	this->R->L=rhs;
-	this->R=rhs;
-	return rhs;
+    p->R=this;
+    p->L=this->L;
+    this->L->R=p;
+    this->L=p;
+    return p;
 }
-DLX::DLX(int pc, int sc):Solver(pc,sc)
+Node*HeadNode::LinkU(Node*p) // place node in same column before this item
 {
-	
-	// head node of head nodes
-	n.v.push_back(new HeadNode(-1));
-	
-	cout<<"size "<<n.v.size()<<endl;
-	
-	// primary constraint head nodes
-	for(int i(0);i<pc;++i)
-	{
-		n.v.push_back(n.v.back()->Linkup(new HeadNode(i))); // link on raw pointers
-	}
+    p->D=this;
+    p->U=this->U;
+    this->U->D=p;
+    this->U=p;
+    ++S;
+    return p;    
+}
+HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
+{
+    // verification overhead, avoid using this at solve time
+    HeadNode*ph=dynamic_cast<HeadNode*>(v[col-1]);
+    if(!ph){throw(runtime_error("failed GetHead"));}
+    if(col!=ph->N){throw(runtime_error("bad Head node name"));}
+    return ph;
+}
 
-	cout<<"size "<<n.v.size()<<endl;
+void DLX::Init(int pc, int sc)
+{
+    n.V(new HeadNode(-1)); // head node of head nodes
+    for(int i(0);i<pc;++i) // primary constraint head nodes
+    {
+        n.V(n.GetHead(-1)->LinkL(new HeadNode(i))); // link on raw pointers
+    }
+    for(int i(0);i<sc;++i) // secondary constraint head nodes
+    {
+        n.V(new HeadNode(i+pc)); // no link to peers
+    }
+}
 
-	// secondary constraint head nodes
-	for(int i(0);i<sc;++i)
-	{
-		n.v.push_back(new HeadNode(i+pc));
-	}
-	
-	// todo: test head links
-	cout<<"DLX constructed\nsize: "<<n.v.size()<<endl;
-}
-DLX::~DLX()
+void DLX::Row(int col)
 {
-	cout<<"~DLX"<<endl;
+    n.V(rowStart=n.GetHead(col)->LinkU(new Node()));
 }
-void DLX::Row()
-{
-}
-void DLX::Col(int /*column*/)
-{
+void DLX::Col(int col)
+{    
+    n.V(rowStart->LinkL(n.GetHead(col)->LinkU(new Node())));
 }
 void DLX::Solve()
 {

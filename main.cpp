@@ -9,52 +9,73 @@
 #include "dlx.h"
 using namespace std;
 
-unique_ptr<Solver> readInput()
+void readInput(Solver&solver)
 {
-	string str;
-	while(cin.good())
-	{
-		getline(cin,str);
-  		if(str.length()&&'['==str[0]){break;}
-	}
+    string str;
+    while(cin.good())
+    {
+        getline(cin,str);
+        if(str.length()&&'['==str[0]){break;}
+    }
 
-	getline(cin,str);
-  	stringstream ss(str);
-  	int pri,sec;
-  	ss>>pri>>sec;
-  	if(ss.fail()){throw(runtime_error("fail reading constraint counts"));}
-  	cout<<"primary constraints: "<<pri<<", "
-  		<<"secondary constraints: "<<sec<<'\n';
-  		
-  	// todo: choose a solver
-  	unique_ptr<Solver>solver(new DLX(pri,sec));
+    getline(cin,str);
+    stringstream ss(str);
+    int pri,sec;
+    ss>>pri>>sec;
+    if(ss.fail()){throw(runtime_error("fail reading constraint counts"));}
+    cout<<"primary constraints: "<<pri<<", "
+        <<"secondary constraints: "<<sec<<'\n';
 
-	while(cin.good())
-	{
-		getline(cin,str);
-		stringstream ss(str);
-		
-  	
-  	
-//  	cout<<str<<' '<<str.length()<<'\n';
-	// cout<< read n constraints todo
-	}
-	return solver;
+    solver.Init(pri,sec);    
+
+    while(cin.good())
+    {
+        getline(cin,str);
+        cout<<"got line: "<<str<<endl;
+        stringstream ss(str);
+        
+        // todo: exit on ']'
+        //
+        //bool initRow(true);
+        //while(true)
+        //{
+        //    int col;
+        //    ss>>col;
+        //    if(ss.bad()){break;}
+        //    cout<<"  got int: "<<col<<endl;
+        //    if(initRow)
+        //    {
+        //        cout<<"    new row with col: "<<col<<endl;
+        //        solver.Row(col);
+        //        initRow=false;
+        //
+        //    }
+        //    else
+        //    {
+        //        cout<<"    new col: "<<col<<endl;
+        //        solver.Col(col);
+        //    }
+        //    if(ss.eof()){break;}
+        //}
+
+    }
 }
 
 int main()
 {
-	cout<<"Generalized Exact Cover Solver\n"
-		<<"reading input...\n";
-	try
-	{
-		unique_ptr<Solver>solver(readInput());
-	}
-	catch(exception const&e)
-	{
-		cout<<"Exception: "<<e.what()<<'\n';
-	}		
-	cout<<"done.\n";
-	 		
-	return(0);
+    cout<<"Generalized Exact Cover Solver\n"
+        <<"reading input...\n";
+    try
+    {
+        // todo: choose a solver
+        DLX solver;
+        readInput(solver);
+    }
+    catch(exception const&e)
+    {
+        cout<<"Exception: "<<e.what()<<'\n';
+    }        
+    cout<<"done.\n";
+
+    return(0);
 }
