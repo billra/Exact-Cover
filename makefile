@@ -1,7 +1,7 @@
 # generic project makefile
 # Bill Ola Rasmussen
 
-CC=g++ 
+CC=g++
 CC_FLAGS=-Wall -std=gnu++0x -pedantic -Wextra
 
 # file names
@@ -14,8 +14,12 @@ $(EXEC): $(OBJECTS)
 	$(CC) $(OBJECTS) -o $(EXEC)
 
 # obtain object files
-%.o: %.cpp %.h
+%.o: %.cpp
 	$(CC) -c $(CC_FLAGS) $< -o $@
+
+# header file dependencies
+dlx.o main.o: dlx.h
+dlx.o main.o: Solver.h # indirectly from dlx.h
 
 # remove generated files
 clean:

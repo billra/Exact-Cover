@@ -4,11 +4,9 @@
 
 // todo: cleanup
 #include <assert.h>
-#include <iostream>
 #include <string>
 #include <sstream>
 #include <stdexcept>
-#include <vector>
 #include <memory>
 using namespace std;
 
@@ -46,25 +44,6 @@ using namespace std;
 // | serves as a master header for all the active headers. The fields U[h], D[h], C[h], S[h], and
 // | N[h] are not used.
 
-struct Node {
-	Node*L,*R,*U,*D,*C; // left, right, up, down, head
-	Node():L(this),R(this),U(this),D(this),C(this){}
-	~Node(){cout<<"~Node\n";}
-	void Linkup(Node*rhs);
-};
-void Node::Linkup(Node*rhs)
-{
-	rhs->L=this;
-	rhs->R=this->R;
-	this->R->L=rhs;
-	this->R=rhs;
-}
-struct HeadNode : public Node {
-	int S,N; // size, name
-	HeadNode(int name):S(0),N(name){}
-};
-
-
 // Generalized Exact Cover
 // -----------------------
 // | We can handle this extra complication by generalizing the exact cover problem. Instead
@@ -80,35 +59,46 @@ struct HeadNode : public Node {
 // | of the algorithm proceeds exactly as before, so we will still call it algorithm DLX.
 
 
-
+Node*Node::Linkup(Node*rhs)
+{
+	cout<<"attaching "<<rhs<<" to "<<this<<endl;
+	cout<<" "<<rhs->L<<endl;
+	rhs->L=this;
+	cout<<" "<<rhs->R<<" "<<this->R<<endl;
+	rhs->R=this->R;
+	cout<<" "<<rhs->R->L<<endl;
+	this->R->L=rhs;
+	this->R=rhs;
+	return rhs;
+}
 DLX::DLX(int pc, int sc):Solver(pc,sc)
 {
-	vector<shared_ptr<Node>>bucket; // everything put in a bucket for cleanup
 	
 	// head node of head nodes
-	bucket.push_back(shared_ptr<HeadNode>(new HeadNode(-1)));
+	n.v.push_back(new HeadNode(-1));
+	
+	cout<<"size "<<n.v.size()<<endl;
 	
 	// primary constraint head nodes
 	for(int i(0);i<pc;++i)
 	{
-		auto p=shared_ptr<HeadNode>(new HeadNode(i));
-		bucket.back()->Linkup(p.get()); // link on raw pointers
-		bucket.push_back(p);
+		n.v.push_back(n.v.back()->Linkup(new HeadNode(i))); // link on raw pointers
 	}
+
+	cout<<"size "<<n.v.size()<<endl;
 
 	// secondary constraint head nodes
 	for(int i(0);i<sc;++i)
 	{
-		bucket.push_back(shared_ptr<HeadNode>(new HeadNode(i+pc)));
+		n.v.push_back(new HeadNode(i+pc));
 	}
 	
 	// todo: test head links
-	// todo: cleaner implementation with http://www.boost.org/doc/libs/1_49_0/libs/ptr_container/doc/ptr_vector.html
-	
-	cout<<"DLX constructed\n";
+	cout<<"DLX constructed\nsize: "<<n.v.size()<<endl;
 }
 DLX::~DLX()
 {
+	cout<<"~DLX"<<endl;
 }
 void DLX::Row()
 {

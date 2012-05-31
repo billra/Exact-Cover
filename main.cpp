@@ -5,10 +5,11 @@
 #include <string>
 #include <sstream>
 #include <stdexcept>
+#include <memory>
 #include "dlx.h"
 using namespace std;
 
-Solver * readInput()
+unique_ptr<Solver> readInput()
 {
 	string str;
 	while(cin.good())
@@ -26,9 +27,8 @@ Solver * readInput()
   		<<"secondary constraints: "<<sec<<'\n';
   		
   	// todo: choose a solver
-  	DLX*solver=new DLX(pri,sec);
-  
-  
+  	unique_ptr<Solver>solver(new DLX(pri,sec));
+
 	while(cin.good())
 	{
 		getline(cin,str);
@@ -42,19 +42,13 @@ Solver * readInput()
 	return solver;
 }
 
-// interface:
-//   ctor(pri,sec)
-//   row()	// start a new row
-//   col(colno) // item on a row
-//   solve()
-
 int main()
 {
 	cout<<"Generalized Exact Cover Solver\n"
 		<<"reading input...\n";
 	try
 	{
-		readInput();
+		unique_ptr<Solver>solver(readInput());
 	}
 	catch(exception const&e)
 	{
