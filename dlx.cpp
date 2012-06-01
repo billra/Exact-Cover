@@ -69,18 +69,19 @@ Node*Node::LinkL(Node*p) // place node in same row before this item
 }
 Node*HeadNode::LinkU(Node*p) // place node in same column before this item
 {
+    p->C=this;
+    ++S;
     p->D=this;
     p->U=this->U;
     this->U->D=p;
     this->U=p;
-    ++S;
     return p;    
 }
 HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
 {
     // verification overhead, avoid using this at solve time
-    HeadNode*ph=dynamic_cast<HeadNode*>(v[col+1]);
-    if(!ph){throw(runtime_error("failed GetHead"));}
+    auto ph=dynamic_cast<HeadNode*>(v[col+1]);
+    if(!ph){throw(runtime_error("failed GetHead, constraint index may be out of range"));}
     if(col!=ph->N){throw(runtime_error("bad Head node name"));}
     return ph;
 }
@@ -97,7 +98,6 @@ void DLX::Init(int pc, int sc)
         n.V(new HeadNode(i+pc)); // no link to peers
     }
 }
-
 void DLX::Row(int col)
 {
     n.V(rowStart=n.GetHead(col)->LinkU(new Node()));
@@ -108,6 +108,13 @@ void DLX::Col(int col)
 }
 void DLX::Solve()
 {
+    cout<<"Solve with "<<n.v.size()<<" nodes\n";
+    HeadNode* h{n.GetHead(-1)};
+    cout<<"head nodes: ";
+    for(Node* p{h->R};p!=h;p=p->R)
+    {
+        cout<<((HeadNode*)p)->N<<" ";
+    }
+    cout<<'\n';
+    
 }
-
-// http://wiki.apache.org/stdcxx/C%2B%2B0xCompilerSupport C++11 compiler feature support table
