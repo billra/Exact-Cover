@@ -4,6 +4,26 @@
 #include <vector>
 #include <iostream>
 
+// note: comments marked with '|' indicate text from the paper
+// http://www-cs-faculty.stanford.edu/~uno/papers/dancing-color.ps.gz
+
+// Algorithm X dlx data structure
+// ------------------------------
+// | One good way to implement algorithm X is to represent each 1 in the
+// | matrix A as a data object x with five fields L[x], R[x], U[x], D[x], C[x]. Rows of the matrix
+// | are doubly linked as circular lists via the L and R fields (“left” and “right”); columns are
+// | doubly linked as circular lists via the U and D fields (“up” and “down”). Each column
+// | list also includes a special data object called its list header.
+// |     The list headers are part of a larger object called a column object. Each column object
+// | y contains the fields L[y], R[y], U [y], D[y], and C[y] of a data object and two additional
+// | fields, S[y] (“size”) and N [y] (“name”); the size is the number of 1s in the column, and the
+// | name is a symbolic identifier for printing the answers. The C field of each object points
+// | to the column object at the head of the relevant column.
+// |     The L and R fields of the list headers link together all columns that still need to be
+// | covered. This circular list also includes a special column object called the root, h, which
+// | serves as a master header for all the active headers. The fields U[h], D[h], C[h], S[h], and
+// | N[h] are not used.
+
 struct HeadNode;
 struct Node {
     Node*L,*R,*U,*D; // left, right, up, down
@@ -20,17 +40,24 @@ struct HeadNode : public Node {
     Node*LinkU(Node*p);
 };
 
+// The implementation of the algorithm uses raw pointers. Node lifetime
+// is managed by a raii cleaning vector.
+
 class RaiiNodes {
-public: // todo
     std::vector<Node*>v;
+public:
     ~RaiiNodes(){for(auto p:v){delete p;}}
     void V(Node*p){v.push_back(p);}
     HeadNode*GetHead(int col); // col is -1 for header head
+    size_t Size(){return v.size();}
 };
 
 class DLX:public Solver{
     RaiiNodes n; // allocation bucket
     Node*rowStart;
+    void Search(HeadNode*hh);
+    HeadNode*ChooseColumn(HeadNode*hh);
+    void Cover(HeadNode*hh);
 public:
     DLX(){} // should not need to define this?
     void Init(int pc, int sc);

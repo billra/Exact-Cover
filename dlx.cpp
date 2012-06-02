@@ -8,56 +8,8 @@
 #include <sstream>
 #include <stdexcept>
 #include <memory>
+#include <limits>
 using namespace std;
-
-// note: comments marked with '|' indicate text from the paper
-// http://www-cs-faculty.stanford.edu/~uno/papers/dancing-color.ps.gz
-
-// Knuth's Algorithm X
-// -------------------
-// | If A is empty, the problem is solved; terminate successfully.
-// | Otherwise choose a column, c (deterministically).
-// | Choose a row, r, such that A[r,c] = 1 (nondeterministically).
-// | Include r in the partial solution.
-// | For each j such that A[r,j] = 1,
-// |     delete column j from matrix A;
-// |         for each i such that A[i,j] = 1,
-// |             delete row i from matrix A.
-// | Repeat this algorithm recursively on the reduced matrix A.
-//
-// deterministically: choose column with fewest 1's
-
-// Algorithm X dlx data structure
-// ------------------------------
-// | One good way to implement algorithm X is to represent each 1 in the
-// | matrix A as a data object x with five fields L[x], R[x], U[x], D[x], C[x]. Rows of the matrix
-// | are doubly linked as circular lists via the L and R fields (“left” and “right”); columns are
-// | doubly linked as circular lists via the U and D fields (“up” and “down”). Each column
-// | list also includes a special data object called its list header.
-// |     The list headers are part of a larger object called a column object. Each column object
-// | y contains the fields L[y], R[y], U [y], D[y], and C[y] of a data object and two additional
-// | fields, S[y] (“size”) and N [y] (“name”); the size is the number of 1s in the column, and the
-// | name is a symbolic identifier for printing the answers. The C field of each object points
-// | to the column object at the head of the relevant column.
-// |     The L and R fields of the list headers link together all columns that still need to be
-// | covered. This circular list also includes a special column object called the root, h, which
-// | serves as a master header for all the active headers. The fields U[h], D[h], C[h], S[h], and
-// | N[h] are not used.
-
-// Generalized Exact Cover
-// -----------------------
-// | We can handle this extra complication by generalizing the exact cover problem. Instead
-// | of requiring all columns of a given 0-1 matrix to be covered by disjoint rows, we
-// | will distinguish two kinds of columns: primary and secondary. The generalized problem
-// | asks for a set of rows that covers every primary column exactly once and every secondary
-// | column at most once.
-// 
-// | Fortunately, we can solve the generalized cover problem by using almost the same
-// | algorithm as before. The only difference is that we initialize the data structure by making
-// | a circular list of the column headers for the primary columns only. The header for each
-// | secondary column should have L and R fields that simply point to itself. The remainder
-// | of the algorithm proceeds exactly as before, so we will still call it algorithm DLX.
-
 
 Node*Node::LinkL(Node*p) // place node in same row before this item
 {
@@ -86,6 +38,22 @@ HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
     return ph;
 }
 
+// Generalized Exact Cover
+// -----------------------
+// | We can handle this extra complication by generalizing the exact cover problem. Instead
+// | of requiring all columns of a given 0-1 matrix to be covered by disjoint rows, we
+// | will distinguish two kinds of columns: primary and secondary. The generalized problem
+// | asks for a set of rows that covers every primary column exactly once and every secondary
+// | column at most once.
+// 
+// | Fortunately, we can solve the generalized cover problem by using almost the same
+// | algorithm as before. The only difference is that we initialize the data structure by making
+// | a circular list of the column headers for the primary columns only. The header for each
+// | secondary column should have L and R fields that simply point to itself. The remainder
+// | of the algorithm proceeds exactly as before, so we will still call it algorithm DLX.
+//
+// see insertion of secondary constraint head nodes below
+
 void DLX::Init(int pc, int sc)
 {
     n.V(new HeadNode(-1)); // head node of head nodes
@@ -106,15 +74,115 @@ void DLX::Col(int col)
 {    
     n.V(rowStart->LinkL(n.GetHead(col)->LinkU(new Node())));
 }
+
+// Knuth's Algorithm X
+// -------------------
+// | If A is empty, the problem is solved; terminate successfully.
+// | Otherwise choose a column, c (deterministically).
+// | Choose a row, r, such that A[r,c] = 1 (nondeterministically).
+// | Include r in the partial solution.
+// | For each j such that A[r,j] = 1,
+// |     delete column j from matrix A;
+// |         for each i such that A[i,j] = 1,
+// |             delete row i from matrix A.
+// | Repeat this algorithm recursively on the reduced matrix A.
+//
+// deterministically: choose column with fewest 1's
+
 void DLX::Solve()
 {
-    cout<<"Solve with "<<n.v.size()<<" nodes\n";
-    HeadNode* h{n.GetHead(-1)};
-    cout<<"head nodes: ";
-    for(Node* p{h->R};p!=h;p=p->R)
-    {
-        cout<<((HeadNode*)p)->N<<" ";
-    }
-    cout<<'\n';
-    
+    cout<<"Solve with "<<n.Size()<<" nodes\n";
+    Search(n.GetHead(-1));
 }
+
+// Our nondeterministic algorithm to find all exact covers can now be cast in the following
+// explicit, deterministic form as a recursive procedure search(k), which is invoked initially
+// with k = 0:
+//     If R[h] = h, print the current solution (see below) and return.
+//     Otherwise choose a column object c (see below).
+//     Cover column c (see below).
+//     For each r ← D[c], D D[c] , . . . , while r = c,
+//         set Ok ← r;
+//         for each j ← R[r], R R[r] , . . . , while j = r,
+//             cover column j (see below);
+//         search(k + 1);
+//         set r ← Ok and c ← C[r];
+//         for each j ← L[r], L L[r] , . . . , while j = r,
+//             uncover column j (see below).
+//     Uncover column c (see below) and return.
+
+
+void DLX::Search(HeadNode*hh)
+{
+    if(hh==hh->R) // no head nodes
+    {
+        cout<<"Solution...\n";
+        // todo: show solution
+        return;
+    }
+
+    HeadNode*c{ChooseColumn(hh)};
+    if(!c)
+    {
+        cout<<"unable to cover column with remaining rows\n";
+        return;
+    }
+    
+    cout<<"Choose column "<<c->N<<" with count "<<c->S<<'\n';
+
+    Cover(c);
+    
+    
+    // todo
+
+
+}
+
+
+// Minimize Search Branching Factor
+// --------------------------------
+// | To choose a column object c, we could simply set c ← R[h]; this is the leftmost
+// | uncovered column. Or if we want to minimize the branching factor, we could set s ← ∞
+// | and then:
+// |     for each j ← R[h], R R[h] , ..., while j = h,
+// |         if S[j] < s set c ← j and s ← S[j].
+// | Then c is a column with the smallest number of 1s. (The S fields are not needed unless
+// | we want to minimize branching in this way.)
+//
+// Side note: special case for queens, Knuth points out that things go faster
+// if a central location is chosen. In the queens case, each primary constraint
+// column has the same number of child nodes, so this implementation could be
+// improved as we always start with the first column.
+
+HeadNode*DLX::ChooseColumn(HeadNode*hh) // least covered column
+{
+    // in: at least one column head node on list
+    HeadNode*pMin{static_cast<HeadNode*>(hh->R)}; // init first as min
+    if(!pMin->S){return nullptr;} // early return, no way to cover a column
+    for(HeadNode*p{static_cast<HeadNode*>(pMin->R)};p!=hh;p=static_cast<HeadNode*>(p->R))
+    {
+        if(!p->S){return nullptr;} // early return, no way to cover a column
+        if(p->S<pMin->S){pMin=p;}
+    }
+    return pMin;
+}
+
+// Covering a Column
+// -----------------
+// | The operation of covering column c is more interesting: It removes c from the header
+// | list and removes all rows in c’s own list from the other column lists they are in.
+// |     Set L R[c] ← L[c] and R L[c] ← R[c].
+// |     For each i ← D[c], D D[c] , ..., while i = c,
+// |         for each j ← R[i], R R[i] , ..., while j = i,
+// |             set U D[j] ← U [j], D U [j] ← D[j],
+// |             and set S C[j] ← S C[j] − 1.
+
+void DLX::Cover(HeadNode*h)
+{
+    cout<<"Covering column "<<h->N<<" with count "<<h->S<<'\n';
+
+}
+
+// consider:
+// - at solve time, loops might be simplified if last R is null
+// - rework data structure so static_casts are not needed
