@@ -55,9 +55,10 @@ public:
 class DLX:public Solver{
     RaiiNodes n; // allocation bucket
     Node*rowStart;
-    void Search(HeadNode*hh);
+    void Search(HeadNode*h, int k);
     HeadNode*ChooseColumn(HeadNode*hh);
-    void Cover(HeadNode*hh);
+    void Cover(HeadNode*c);
+    void Uncover(HeadNode*c);
 public:
     DLX(){} // should not need to define this?
     void Init(int pc, int sc);
