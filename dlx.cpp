@@ -40,16 +40,32 @@ HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
     if(col!=ph->N){throw(runtime_error("bad Head node name"));}
     return ph;
 }
-//vector<Node*>RaiiNodes::Clone()
-//{
-//    // todo: smart pointers instead delete in destructor
-//    // get ptr from smart pointer
-//    //vector<Node*>c;
-//    //for(auto i:v)
-//    //{
-//    //    c.push_back(i);
-//    //}
-//}
+
+vector<std::unique_ptr<Node>>RaiiNodes::Snap()
+{
+    vector<unique_ptr<Node>> x;
+    for(auto&i:v)
+    {
+        x.push_back(i.get()->Clone());
+    }
+    return x;
+}
+
+//#include <typeinfo>
+bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)
+{
+    if(x.size()!=v.size()){return false;}
+    for(size_t i{0};i<x.size();++i)
+    {
+        //cout<<"types: "<<typeid(*x[i].get()).name()<<" "<<typeid(*v[i].get()).name()<<"\n";
+        if(!x[i].get()->Same(v[i].get()))
+        {
+            return false;
+        }
+    }
+    return true;
+}
+
 // Generalized Exact Cover
 // -----------------------
 // | We can handle this extra complication by generalizing the exact cover problem. Instead
@@ -103,12 +119,16 @@ void DLX::Solve()
 {
     cout<<"Solve with "<<n.Size()<<" nodes\n";
     
-    // clone our data to verify post run integrity
-    //RaiiNodes x;
-    //for(i:)
-    Search(n.GetHead(-1),0);
+    vector<unique_ptr<Node>>x{n.Snap()}; // capture start state
+    if(!n.Comp(x)){throw(runtime_error("early node structure integrity failure"));}
     
-    // todo compare before and after (deep) array to ensure proper reversal
+    Search(n.GetHead(-1),0);
+
+
+    //++n.GetHead(1)->S; // test integrity check
+
+    if(!n.Comp(x)){throw(runtime_error("node structure integrity failure"));}
+    cout<<"Node structure integrity verified.\n";
 }
 
 // Algorithm Details

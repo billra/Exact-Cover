@@ -25,34 +25,51 @@
 // | serves as a master header for all the active headers. The fields U[h], D[h], C[h], S[h], and
 // | N[h] are not used.
 
-struct HeadNode;
-struct Node {
+class HeadNode;
+class Node {
+public:
     Node*L,*R,*U,*D; // left, right, up, down
     HeadNode*C; // head
     Node():L(this),R(this),U(this),D(this),C(nullptr){/*std::cout<<"Node "<<this<<"\n";*/}
-    virtual ~Node(){std::cout<<"~Node "<<this<<"\n";}
+    virtual ~Node(){/*std::cout<<"~Node "<<this<<"\n";*/}
     Node*LinkL(Node*p);
+    // node integrity test support
+    virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<Node>{new Node(*this)};}
+    virtual bool Same(const Node*const n)const
+    {
+        //std::cout<<" node comp\n";
+        return L==n->L&&R==n->R&&U==n->U&&D==n->D&&C==n->C;
+    }
 };
 
-struct HeadNode : public Node {
+class HeadNode : public Node {
+public:
     int S,N; // size, name
     HeadNode(int name):S(0),N(name){/*std::cout<<"Head Node "<<this<<"\n";*/}
-    virtual ~HeadNode(){std::cout<<"~HeadNode "<<this<<"\n";}
+    virtual ~HeadNode(){/*std::cout<<"~HeadNode "<<this<<"\n";*/}
     Node*LinkU(Node*p);
+    // node integrity test support
+    virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<HeadNode>{new HeadNode(*this)};}
+    virtual bool Same(const Node*const n)const // must have same signature, so casting later on...
+    {
+        //std::cout<<" HeadNode comp";
+        auto h=dynamic_cast<const HeadNode*const>(n);
+        return h&&Node::Same(n)&&S==h->S&&N==h->N;
+    }
 };
 
 // The implementation of the algorithm uses raw pointers. Node lifetime
-// is managed by a raii cleaning vector.
+// is managed by unique_ptr vector.
 
 class RaiiNodes {
     std::vector<std::unique_ptr<Node>>v;
 public:
-    //~RaiiNodes(){for(auto p:v){delete p;}}
     void V(Node*p){v.push_back(std::unique_ptr<Node>{p});}
     HeadNode*GetHead(int col); // col is -1 for header head
     size_t Size(){return v.size();}
-    //std::vector<Node*> Clone(); // for integrity testing
-    //todo: Snap and Comp functions, new vec x
+    // node integrity test support
+    std::vector<std::unique_ptr<Node>> Snap();
+    bool Comp(std::vector<std::unique_ptr<Node>>&x);
 };
 
 class DLX:public Solver{
