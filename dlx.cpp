@@ -35,12 +35,21 @@ Node*HeadNode::LinkU(Node*p) // place node in same column before this item
 HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
 {
     // verification overhead, avoid using this at solve time
-    auto ph=dynamic_cast<HeadNode*>(v[col+1]);
+    auto ph=dynamic_cast<HeadNode*>(v[col+1].get());
     if(!ph){throw(runtime_error("failed GetHead, constraint index may be out of range"));}
     if(col!=ph->N){throw(runtime_error("bad Head node name"));}
     return ph;
 }
-
+//vector<Node*>RaiiNodes::Clone()
+//{
+//    // todo: smart pointers instead delete in destructor
+//    // get ptr from smart pointer
+//    //vector<Node*>c;
+//    //for(auto i:v)
+//    //{
+//    //    c.push_back(i);
+//    //}
+//}
 // Generalized Exact Cover
 // -----------------------
 // | We can handle this extra complication by generalizing the exact cover problem. Instead
@@ -93,6 +102,10 @@ void DLX::Col(int col)
 void DLX::Solve()
 {
     cout<<"Solve with "<<n.Size()<<" nodes\n";
+    
+    // clone our data to verify post run integrity
+    //RaiiNodes x;
+    //for(i:)
     Search(n.GetHead(-1),0);
     
     // todo compare before and after (deep) array to ensure proper reversal
@@ -159,7 +172,7 @@ void DLX::Search(HeadNode*h,int k)
 // | we want to minimize branching in this way.)
 //
 // Side note: special case for queens, Knuth points out that things go faster
-// if a central location is chosen. In the queens case, each primary constraint
+// if a central locations are chosen first. In the queens case, each primary constraint
 // column has the same number of child nodes, so this implementation could be
 // improved as we always start with the first column.
 

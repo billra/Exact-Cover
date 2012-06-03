@@ -3,6 +3,7 @@
 #include "Solver.h"
 #include <vector>
 #include <iostream>
+#include <memory>
 
 // note: comments marked with '|' indicate text from the paper
 // http://www-cs-faculty.stanford.edu/~uno/papers/dancing-color.ps.gz
@@ -29,14 +30,14 @@ struct Node {
     Node*L,*R,*U,*D; // left, right, up, down
     HeadNode*C; // head
     Node():L(this),R(this),U(this),D(this),C(nullptr){/*std::cout<<"Node "<<this<<"\n";*/}
-    virtual ~Node(){/*std::cout<<"~Node "<<this<<"\n";*/}
+    virtual ~Node(){std::cout<<"~Node "<<this<<"\n";}
     Node*LinkL(Node*p);
 };
 
 struct HeadNode : public Node {
     int S,N; // size, name
     HeadNode(int name):S(0),N(name){/*std::cout<<"Head Node "<<this<<"\n";*/}
-    //virtual ~HeadNode(){std::cout<<"~HeadNode "<<this<<"\n";}
+    virtual ~HeadNode(){std::cout<<"~HeadNode "<<this<<"\n";}
     Node*LinkU(Node*p);
 };
 
@@ -44,12 +45,14 @@ struct HeadNode : public Node {
 // is managed by a raii cleaning vector.
 
 class RaiiNodes {
-    std::vector<Node*>v;
+    std::vector<std::unique_ptr<Node>>v;
 public:
-    ~RaiiNodes(){for(auto p:v){delete p;}}
-    void V(Node*p){v.push_back(p);}
+    //~RaiiNodes(){for(auto p:v){delete p;}}
+    void V(Node*p){v.push_back(std::unique_ptr<Node>{p});}
     HeadNode*GetHead(int col); // col is -1 for header head
     size_t Size(){return v.size();}
+    //std::vector<Node*> Clone(); // for integrity testing
+    //todo: Snap and Comp functions, new vec x
 };
 
 class DLX:public Solver{
