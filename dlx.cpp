@@ -125,9 +125,6 @@ void DLX::Solve()
     vector<Node*>O;
     Search(n.GetHead(-1),0,O);
 
-
-    //++n.GetHead(1)->S; // test integrity check
-
     if(!n.Comp(x)){throw(runtime_error("node structure integrity failure"));}
     cout<<"Node structure integrity verified.\n";
 }
@@ -198,7 +195,6 @@ void DLX::Search(HeadNode*h,int k,vector<Node*>&O)
 // | containing O sub 0, O sub 1, ..., O sub k−1 , where the row containing data object O is
 // | printed by printing N[C[O]], N[C[R[O]]], N[C[R[R[O]]]], etc.
 
-
 void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)
 {
     cout<<"[\n";
@@ -215,7 +211,6 @@ void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)
     
     cout<<"]\n";
 }
-
 
 // Minimize Search Branching Factor
 // --------------------------------

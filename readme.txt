@@ -12,7 +12,8 @@ Usage
 -----
 CreateQueensData {size} - create exact cover problem data for n queens board size
 CreateQueensData - no parameter to run unit tests on creation code
-CreateQueensData {size} | solve > soln.txt - stream problem into solver and write solution to file (todo!)
+CreateQueensData {size} | solve > soln.txt - stream problem into solver and write solution to file
+e.g. CreateQueensData.py 6 | solve - prints the 4 solutions to a 6x6 board
 
 
 
