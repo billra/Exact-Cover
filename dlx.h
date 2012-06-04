@@ -75,7 +75,8 @@ public:
 class DLX:public Solver{
     RaiiNodes n; // allocation bucket
     Node*rowStart;
-    void Search(HeadNode*h, int k);
+    void Search(HeadNode*h,int k,std::vector<Node*>&O);
+    void ShowSolution(int k,std::vector<Node*>&O);
     HeadNode*ChooseColumn(HeadNode*hh);
     void Cover(HeadNode*c);
     void Uncover(HeadNode*c);

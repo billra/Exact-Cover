@@ -122,7 +122,8 @@ void DLX::Solve()
     vector<unique_ptr<Node>>x{n.Snap()}; // capture start state
     if(!n.Comp(x)){throw(runtime_error("early node structure integrity failure"));}
     
-    Search(n.GetHead(-1),0);
+    vector<Node*>O;
+    Search(n.GetHead(-1),0,O);
 
 
     //++n.GetHead(1)->S; // test integrity check
@@ -140,22 +141,24 @@ void DLX::Solve()
 // |     Otherwise choose a column object c (see below).
 // |     Cover column c (see below).
 // |     For each r ← D[c], D[D[c]] , ..., while r ≠ c,
-// |         set Ok ← r;
+// |         set O sub k ← r;
 // |         for each j ← R[r], R[R[r]] , ..., while j ≠ r,
 // |             cover column j (see below);
 // |         search(k + 1);
-// |         set r ← Ok and c ← C[r];
+// |         set r ← O sub k and c ← C[r];      * note 1
 // |         for each j ← L[r], L[L[r]] , ..., while j ≠ r,
 // |             uncover column j (see below).
 // |     Uncover column c (see below) and return.
+//
+// Note 1: r and c already have these values if recursion is used.
+// This hint might mean that a non recursive implementation is possible
+// if we keep r stacked on O.
 
-
-void DLX::Search(HeadNode*h,int k)
+void DLX::Search(HeadNode*h,int k,vector<Node*>&O)
 {
     if(h==h->R) // no head nodes
     {
-        cout<<"Solution...\n";
-        // todo: show solution
+        ShowSolution(k,O);
         return;
     }
 
@@ -166,18 +169,51 @@ void DLX::Search(HeadNode*h,int k)
         // search branch, return
         // | If column c is entirely zero, there are no subalgorithms
         // | and the process terminates unsuccessfully.
-        cout<<"unable to cover column with remaining rows\n";
+        // cout<<"unable to cover column with remaining rows\n";
         return;
     }
     
-    cout<<"Choose column "<<c->N<<" with count "<<c->S<<" level "<<k<<'\n';
-
+    //cout<<"Choose column "<<c->N<<" with count "<<c->S<<" level "<<k<<'\n';
     Cover(c);
-    
-    
-    // todo
+    for(Node*r{c->D};r!=c;r=r->D) // all the rows in column c
+    {
+        O.push_back(r); // implements: set O sub k ← r;
+        for(Node*j{r->R};j!=r;j=j->R) // all the nodes in row
+        {
+            Cover(j->C);
+        }        
 
+        Search(h,k+1,O);
+
+        O.pop_back(); // implements: set r ← O sub k and c ← C[r];
+        for(Node*j{r->L};j!=r;j=j->L) // all the nodes in row
+        {
+            Uncover(j->C);
+        }        
+    }
     Uncover(c);
+}
+
+// | The operation of printing the current solution is easy: We successively print the rows
+// | containing O sub 0, O sub 1, ..., O sub k−1 , where the row containing data object O is
+// | printed by printing N[C[O]], N[C[R[O]]], N[C[R[R[O]]]], etc.
+
+
+void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)
+{
+    cout<<"[\n";
+    
+    for(auto r:O)
+    {
+        cout<<r->C->N<<" ";
+        for(Node*j{r->R};j!=r;j=j->R) // all the nodes in row
+        {
+            cout<<j->C->N<<" ";
+        }
+        cout<<"\n";
+    }
+    
+    cout<<"]\n";
 }
 
 
@@ -222,7 +258,7 @@ HeadNode*DLX::ChooseColumn(HeadNode*h) // least covered column
 
 void DLX::Cover(HeadNode*c)
 {
-    cout<<"Covering column "<<c->N<<" with count "<<c->S<<'\n';
+    //cout<<"Covering column "<<c->N<<" with count "<<c->S<<'\n';
     // remove self from head node list
     c->R->L=c->L;
     c->L->R=c->R;
@@ -251,7 +287,7 @@ void DLX::Cover(HeadNode*c)
 
 void DLX::Uncover(HeadNode*c)
 {
-    cout<<"Uncovering column "<<c->N<<" with count "<<c->S<<'\n';
+    //cout<<"Uncovering column "<<c->N<<" with count "<<c->S<<'\n';
     // operations carried out in reverse order of Cover()
 
     // process column
