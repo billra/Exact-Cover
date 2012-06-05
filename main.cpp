@@ -8,19 +8,20 @@
 #include <stdexcept>
 #include <memory>
 #include <ctime>
+#include <chrono>
 #include "dlx.h"
 using namespace std;
 
 // observer pattern
 void CallBack(Solver::Event e)
 {
-    static double begin,soln,end;
+    static chrono::high_resolution_clock::time_point begin,soln,end;
     static bool first{true};
     static int count{0};
     
     if(e==Solver::Event::Begin)
     {
-        begin=clock()/(double)CLOCKS_PER_SEC;
+        begin=chrono::high_resolution_clock::now();
         cout<<"event: begin\n";
     }
     if(e==Solver::Event::Soln)
@@ -28,17 +29,17 @@ void CallBack(Solver::Event e)
         ++count;
         if(first)
         {
-            soln=clock()/(double)CLOCKS_PER_SEC;
+            soln=chrono::high_resolution_clock::now();
             first=false;
-            double d{soln-begin};
-            cout<<"time to first solution: "<<setprecision(6)<<d<<" seconds\n";
+            auto d = chrono::duration_cast<chrono::milliseconds>(soln-begin);
+            cout<<"time to first solution: "<<d.count()/1000.<<" seconds\n";
         }
     }
     if(e==Solver::Event::End)
     {
-        end=clock()/(double)CLOCKS_PER_SEC;
-        double d{end-begin};
-        cout<<count<<" solution(s) found, full solve time: "<<setprecision(6)<<d<<" seconds\n";
+        end=chrono::high_resolution_clock::now();
+        auto d = chrono::duration_cast<chrono::milliseconds>(end-begin);
+        cout<<count<<" solution(s) found, full solve time: "<<d.count()/1000.<<" seconds\n";
     }
 }
 
