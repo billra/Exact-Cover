@@ -10,10 +10,11 @@ So, an exact cover solver can be used to solve any problem in NP.
 -----
 Usage
 -----
-CreateQueensData {size} - create exact cover problem data for n queens board size
-CreateQueensData - no parameter to run unit tests on creation code
-CreateQueensData {size} | solve > soln.txt - stream problem into solver and write solution to file
-e.g. CreateQueensData.py 6 | solve - prints the 4 solutions to a 6x6 board
+CreateQueensData {size} : create exact cover problem data for n queens board size
+CreateQueensData : no parameter to run unit tests on creation code
+CreateQueensData {size} | solve > soln.txt : stream problem into solver and write solution to file
+e.g. CreateQueensData.py 6 | solve : prints the 4 solutions to a 6x6 board
+     CreateQueensData.py 14 | solve -quiet : prints the number of solutions to a 14x14 board
 
 
 

@@ -76,8 +76,12 @@ void readInput(Solver&solver)
     throw(runtime_error("no closing bracket in input"));
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    string flag(argc>1?argv[1]:"");
+    flag.resize(2);
+    const bool quiet{"-q"==flag};
+    
     cout<<"Generalized Exact Cover Solver\n"
         <<"reading input...\n";
     try
@@ -85,7 +89,7 @@ int main()
         // todo: choose a solver
         DLX solver;
         readInput(solver);
-        solver.Solve(false);
+        solver.Solve(!quiet);
     }
     catch(exception const&e)
     {
