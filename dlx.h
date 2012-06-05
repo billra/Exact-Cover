@@ -80,9 +80,10 @@ class DLX:public Solver{
     HeadNode*ChooseColumn(HeadNode*hh);
     void Cover(HeadNode*c);
     void Uncover(HeadNode*c);
+    void(*Notify)(Event);
 public:
     DLX(){} // should not need to define this?
-    void Init(int pc, int sc);
+    void Init(int pc, int sc, void(*CallBack)(Event));
     void Row(int col);
     void Col(int col);
     void Solve();

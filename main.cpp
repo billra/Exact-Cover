@@ -9,6 +9,18 @@
 #include "dlx.h"
 using namespace std;
 
+// observer pattern
+void CallBack(Solver::Event e)
+{
+    // todo: report timing
+    cout<<"event: ";
+    std::string s{"unknown"};
+    if(e==Solver::Event::Begin){s="Begin";}
+    if(e==Solver::Event::Soln ){s="Soln";}
+    if(e==Solver::Event::End  ){s="End";}
+    cout<<s<<endl;
+}
+
 void readInput(Solver&solver)
 {
     string str;
@@ -25,7 +37,7 @@ void readInput(Solver&solver)
     cout<<"primary constraints: "<<pri<<", "
         <<"secondary constraints: "<<sec<<'\n';
 
-    solver.Init(pri,sec);    
+    solver.Init(pri,sec,CallBack);    
 
     while(cin.good()) // read lines (rows)
     {

@@ -82,8 +82,10 @@ bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)
 //
 // see insertion of secondary constraint head nodes below
 
-void DLX::Init(int pc, int sc)
+void DLX::Init(int pc, int sc, void(*CallBack)(Event))
 {
+    Notify=CallBack;
+    
     n.V(new HeadNode(-1)); // head node of head nodes
     for(int i(0);i<pc;++i) // primary constraint head nodes
     {
@@ -123,7 +125,9 @@ void DLX::Solve()
     if(!n.Comp(x)){throw(runtime_error("early node structure integrity failure"));}
     
     vector<Node*>O;
+    Notify(Event::Begin);
     Search(n.GetHead(-1),0,O);
+    Notify(Event::End);
 
     if(!n.Comp(x)){throw(runtime_error("node structure integrity failure"));}
     cout<<"Node structure integrity verified.\n";
@@ -155,6 +159,7 @@ void DLX::Search(HeadNode*h,int k,vector<Node*>&O)
 {
     if(h==h->R) // no head nodes
     {
+        Notify(Event::Soln);
         ShowSolution(k,O);
         return;
     }
