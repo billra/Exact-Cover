@@ -117,8 +117,10 @@ void DLX::Col(int col)
 // |             delete row i from matrix A.
 // | Repeat this algorithm recursively on the reduced matrix A.
 
-void DLX::Solve()
+void DLX::Solve(bool showSoln)
 {
+    show=showSoln;
+    
     cout<<"Solve with "<<n.Size()<<" nodes\n";
     
     vector<unique_ptr<Node>>x{n.Snap()}; // capture start state
@@ -160,7 +162,7 @@ void DLX::Search(HeadNode*h,int k,vector<Node*>&O)
     if(h==h->R) // no head nodes
     {
         Notify(Event::Soln);
-        ShowSolution(k,O);
+        if(show){ShowSolution(k,O);}
         return;
     }
 

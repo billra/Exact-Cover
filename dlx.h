@@ -81,12 +81,13 @@ class DLX:public Solver{
     void Cover(HeadNode*c);
     void Uncover(HeadNode*c);
     void(*Notify)(Event);
+    bool show;
 public:
     DLX(){} // should not need to define this?
     void Init(int pc, int sc, void(*CallBack)(Event));
     void Row(int col);
     void Col(int col);
-    void Solve();
+    void Solve(bool showSoln=true);
     DLX&operator=(const DLX&)=delete; // no assignment
     DLX(const DLX&)=delete; // no copy constructor
 };
