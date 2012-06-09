@@ -64,9 +64,9 @@ def runTests():
     print('       '+sys.argv[0]+' [width] [height]')
     import platform
     print('python version '+platform.python_version())
-    #print('running unit tests...')
-    #import doctest
-    #doctest.testfile('CreateYpentominoTests.txt')
+    print('running unit tests...')
+    import doctest
+    doctest.testfile('CreateYpentominoTests.txt')
     print('done.')
 
 if __name__ == "__main__":

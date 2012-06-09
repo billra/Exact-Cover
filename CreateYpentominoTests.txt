@@ -1,0 +1,52 @@
+These are the tests for the CreateYpentominoData functions.
+
+First, import the classes:
+
+	>>> from CreateYpentominoData import *
+
+All 8 Y Pentomino orientations. Order is unimportant.
+
+	>>> for i in sorted(tileOrientations()):print(i)
+	... 
+	[(0, 0), (-1, 0), (-2, 0), (-3, 0), (-1, -1)]
+	[(0, 0), (-1, 0), (-2, 0), (-3, 0), (-1, 1)]
+	[(0, 0), (0, -1), (0, -2), (0, -3), (-1, -1)]
+	[(0, 0), (0, -1), (0, -2), (0, -3), (1, -1)]
+	[(0, 0), (0, 1), (0, 2), (0, 3), (-1, 1)]
+	[(0, 0), (0, 1), (0, 2), (0, 3), (1, 1)]
+	[(0, 0), (1, 0), (2, 0), (3, 0), (1, -1)]
+	[(0, 0), (1, 0), (2, 0), (3, 0), (1, 1)]
+
+Minimal board horizontal
+
+	>>> b=Board(4,2)
+	>>> for i in sorted(b.constraints()):print(i)
+	... 
+	[0, 1, 2, 3, 5]
+	[3, 2, 1, 0, 6]
+	[4, 5, 6, 7, 1]
+	[7, 6, 5, 4, 2]
+
+Minimal board vertical
+
+	>>> b=Board(2,4)
+	>>> for i in sorted(b.constraints()):print(i)
+	... 
+	[0, 2, 4, 6, 3]
+	[1, 3, 5, 7, 2]
+	[6, 4, 2, 0, 5]
+	[7, 5, 3, 1, 4]
+
+Exact cover problem specification creation. May fail of constraint order changes.
+
+	>>> exactCoverSpec(2,4) # doctest:+ELLIPSIS
+	A...
+	[
+	8 0
+	0 2 4 6 3
+	6 4 2 0 5
+	1 3 5 7 2
+	7 5 3 1 4
+	]
+
+end of tests.
