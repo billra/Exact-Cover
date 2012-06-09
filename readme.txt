@@ -7,6 +7,15 @@ Motivation
 
 So, an exact cover solver can be used to solve any problem in NP.
 
+-----------
+Description
+-----------
+
+This project contains code to create exact cover data from problems:
+CreateQueensData.py - n Queens problem
+CreateYpentominoData.py - Y Pentomino cover
+and a classic Algorithm X dancing links solver.
+
 -----
 Usage
 -----
@@ -16,5 +25,7 @@ CreateQueensData {size} | solve > soln.txt : stream problem into solver and writ
 e.g. CreateQueensData.py 6 | solve : prints the 4 solutions to a 6x6 board
      CreateQueensData.py 14 | solve -quiet : prints the number of solutions to a 14x14 board
 
+CreateYpentominoData.py 11 20 | solve -quiet : count solutions to a 11x20 board
+CreateYpentominoData.py 15 | solve : show solutions to a 15x15 board
 
 
