@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # Generate Y Pentomino Exact Cover Data
 # Bill Ola Rasmussen
-# version 0.1
+# version 1.0
 
 # see, e.g. http://www.math.ucf.edu/~reid/Polyomino/y5_rect.html
 
@@ -13,37 +13,19 @@ class Board(object):
         self.h=h    # height
     def __str__(self):
         return 'board size: '+str(self.w)+' x '+str(self.h)
-    #def xy_qr(self,x,y):
-    #    'convert cartesian to diagonal coordinates'
-    #    return x+self.n-1-y,x+y
     def constraintCounts(self):
         'number of primary and secondary constraints'
         return self.w*self.h,0
-    #def constraints(self,x,y):
-    #    'column constraints for queen at position x,y'
-    #    r=[x,y+self.n] # row and column constraints
-    #    d=self.xy_qr(x,y)
-    #    if 0<d[0]<self.t-1:
-    #        r.append(d[0]-1+self.pc)
-    #    if 0<d[1]<self.t-1:
-    #        r.append(d[1]-1+self.pc+self.dc)
-    #    return r
+    def validPlacement(self,x,y,t):
+        return all(-1<i[0]+x<self.w and -1<i[1]+y<self.h for i in t)
+    def makeConstraint(self,x,y,t):
+        return [i[0]+x + self.w*(i[1]+y) for i in t]
     def constraints(self):
         for x in range(self.w):
             for y in range(self.h):
                 for t in tileOrientations():
-                    yield [2,3,4]
-    
-def explain(b):
-    'describe file data'
-    s='A generalized exact cover specification for the Y Pentomino cover problem.\n'\
-      +str(b)+'\n'\
-      'First digit: number of primary constraints "exactly one".\n'\
-      'Second digit: number of secondary constraints "at most one".\n'\
-      'Each line after the first two digits describes a unique Y Pentomino position.\n'\
-      'For more information, see\n'\
-      'http://www.math.ucf.edu/~reid/Polyomino/y5_rect.html'
-    print(s)
+                    if self.validPlacement(x,y,t):
+                        yield self.makeConstraint(x,y,t)
 
 def tileOrientations():
     'generate the 8 unique Y pentomino orientations'
@@ -55,23 +37,26 @@ def tileOrientations():
             x=[-n for n in x] # reflect across Y axis
             for ys in range(2):
                 y=[-n for n in y] # reflect across X axis
-                yield zip(x,y)
+                yield list(zip(x,y))
+
+def explain(b):
+    'describe file data'
+    s='A generalized exact cover specification for the Y Pentomino cover problem.\n'\
+      +str(b)+'\n'\
+      'First digit: number of primary constraints "exactly one".\n'\
+      'Second digit: number of secondary constraints "at most one".\n'\
+      'Each line after the first two digits describes a unique Y Pentomino position.\n'\
+      'For more information, see\n'\
+      'http://www.math.ucf.edu/~reid/Polyomino/y5_rect.html'
+    print(s)
 
 def exactCoverSpec(w,h):
     b=Board(w,h)
     explain(b)
     print('[')
     print(' '.join(map(str,b.constraintCounts())))
-    
-    for a in tileOrientations():
-        print(list(a))
-
     for z in b.constraints():
         print(' '.join(map(str,z)))
-
-    #for x in range(n):
-    #    for y in range(n):
-    #        print(' '.join(map(str,b.constraints(x,y))))
     print(']')
 
 def runTests():
