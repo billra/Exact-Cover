@@ -46,7 +46,7 @@ def explain(b):
       'First digit: number of primary constraints "exactly one".\n'\
       'Second digit: number of secondary constraints "at most one".\n'\
       'Each line after the first two digits describes a unique Y Pentomino position.\n'\
-      'For more information, see\n'\
+      'For more Y Pentomino information, see\n'\
       'http://www.math.ucf.edu/~reid/Polyomino/y5_rect.html'
     print(s)
 

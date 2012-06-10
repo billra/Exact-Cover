@@ -28,4 +28,6 @@ e.g. CreateQueensData.py 6 | solve : prints the 4 solutions to a 6x6 board
 CreateYpentominoData.py 11 20 | solve -quiet : count solutions to a 11x20 board
 CreateYpentominoData.py 15 | solve : show solutions to a 15x15 board
 
+Create png of the first solution:
+CreateYpentominoData.py 10 14 | solve | boardPng.py 10 14
 
