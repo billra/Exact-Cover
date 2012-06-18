@@ -16,8 +16,8 @@ using namespace std;
 void CallBack(Solver::Event e)
 {
     static chrono::high_resolution_clock::time_point begin,soln,end;
-    static bool first{true};
-    static int count{0};
+    static bool first(true);
+    static int count(0);
     
     if(e==Solver::Event::Begin)
     {
@@ -81,7 +81,7 @@ int main(int argc, char *argv[])
 {
     string flag(argc>1?argv[1]:"");
     flag.resize(2);
-    const bool quiet{"-q"==flag};
+    const bool quiet("-q"==flag);
     
     cout<<"Generalized Exact Cover Solver\n"
         <<"reading input...\n";

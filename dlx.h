@@ -34,7 +34,7 @@ public:
     virtual ~Node(){/*std::cout<<"~Node "<<this<<"\n";*/}
     Node*LinkL(Node*p);
     // node integrity test support
-    virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<Node>{new Node(*this)};}
+    virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<Node>(new Node(*this));}
     virtual bool Same(const Node*const n)const
     {
         //std::cout<<" node comp\n";
@@ -49,7 +49,7 @@ public:
     virtual ~HeadNode(){/*std::cout<<"~HeadNode "<<this<<"\n";*/}
     Node*LinkU(Node*p);
     // node integrity test support
-    virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<HeadNode>{new HeadNode(*this)};}
+    virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<HeadNode>(new HeadNode(*this));}
     virtual bool Same(const Node*const n)const // must have same signature, so casting later on...
     {
         //std::cout<<" HeadNode comp";
@@ -64,7 +64,7 @@ public:
 class RaiiNodes {
     std::vector<std::unique_ptr<Node>>v;
 public:
-    void V(Node*p){v.push_back(std::unique_ptr<Node>{p});}
+    void V(Node*p){v.push_back(std::unique_ptr<Node>(p));}
     HeadNode*GetHead(int col); // col is -1 for header head
     size_t Size(){return v.size();}
     // node integrity test support
@@ -88,7 +88,7 @@ public:
     void Row(int col);
     void Col(int col);
     void Solve(bool showSoln=true);
-    DLX&operator=(const DLX&)=delete; // no assignment
-    DLX(const DLX&)=delete; // no copy constructor
+    DLX&operator=(const DLX&); // no assignment
+    DLX(const DLX&); // no copy constructor
 };
 
