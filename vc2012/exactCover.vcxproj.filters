@@ -9,9 +9,8 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="Resource Files">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    <Filter Include="Python Files">
+      <UniqueIdentifier>{ef7b6c9e-3c3a-443a-bb3b-521102a0ebb9}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -26,5 +25,22 @@
     <ClInclude Include="..\dlx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\Solver.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\readme.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\boardPng.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\CreateQueensData.py">
+      <Filter>Python Files</Filter>
+    </None>
+    <None Include="..\CreateYpentominoData.py">
+      <Filter>Python Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
