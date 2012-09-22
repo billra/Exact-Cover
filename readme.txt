@@ -31,3 +31,13 @@ CreateYpentominoData.py 15 | solve : show solutions to a 15x15 board
 Create png of the first solution:
 CreateYpentominoData.py 10 14 | solve | boardPng.py 10 14
 
+--------------
+Cross Platform
+--------------
+This project works both under Linux and Windows 7.
+
+Most Python code is 3.x, however boardPng uses 2.x because it depends on pypng.
+Install launchwin.amd64.msi py launcher https://bitbucket.org/vinay.sajip/pylauncher/downloads to support "#!/usr/bin/env pythonX" version dependency declarations under Windows.
+
+Linux compilation is done using "makefile". A simple VS2012 build project is in the directory vc2012. 
+Under windows use, e.g., "vc2012\Debug\exactCover.exe" instead of "solve" in the usage section above.
