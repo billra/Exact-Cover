@@ -39,5 +39,5 @@ This project works both under Linux and Windows 7.
 Most Python code is 3.x, however boardPng uses 2.x because it depends on pypng.
 Install launchwin.amd64.msi py launcher https://bitbucket.org/vinay.sajip/pylauncher/downloads to support "#!/usr/bin/env pythonX" version dependency declarations under Windows.
 
-Linux compilation is done using "makefile". A simple VS2012 build project is in the directory vc2012. 
-Under windows use, e.g., "vc2012\Debug\exactCover.exe" instead of "solve" in the usage section above.
+Linux compilation is done using "makefile". A simple Visual Studio build project is in the directory VisualStudio. 
+Under windows use, e.g., "VisualStudio\Debug\exactCover.exe" instead of "solve" in the usage section above.
