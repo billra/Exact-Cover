@@ -49,11 +49,11 @@ public:
 	virtual ~HeadNode(){/*std::cout<<"~HeadNode "<<this<<"\n";*/}
 	Node*LinkU(Node*p);
 	// node integrity test support
-	virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<HeadNode>(new HeadNode(*this));}
-	virtual bool Same(const Node*const n)const // must have same signature, so casting later on...
+	std::unique_ptr<Node>Clone()const override{return std::unique_ptr<HeadNode>(new HeadNode(*this));}
+	bool Same(const Node*const n)const override// must have same signature, so casting later on...
 	{
 		//std::cout<<" HeadNode comp";
-		auto h=dynamic_cast<const HeadNode*const>(n);
+		const auto h(dynamic_cast<const HeadNode*const>(n));
 		return h&&Node::Same(n)&&S==h->S&&N==h->N;
 	}
 };
