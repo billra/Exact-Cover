@@ -28,67 +28,67 @@
 class HeadNode;
 class Node {
 public:
-    Node*L,*R,*U,*D; // left, right, up, down
-    HeadNode*C; // head
-    Node():L(this),R(this),U(this),D(this),C(nullptr){/*std::cout<<"Node "<<this<<"\n";*/}
-    virtual ~Node(){/*std::cout<<"~Node "<<this<<"\n";*/}
-    Node*LinkL(Node*p);
-    // node integrity test support
-    virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<Node>(new Node(*this));}
-    virtual bool Same(const Node*const n)const
-    {
-        //std::cout<<" node comp\n";
-        return L==n->L&&R==n->R&&U==n->U&&D==n->D&&C==n->C;
-    }
+	Node*L,*R,*U,*D; // left, right, up, down
+	HeadNode*C; // head
+	Node():L(this),R(this),U(this),D(this),C(nullptr){/*std::cout<<"Node "<<this<<"\n";*/}
+	virtual ~Node(){/*std::cout<<"~Node "<<this<<"\n";*/}
+	Node*LinkL(Node*p);
+	// node integrity test support
+	virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<Node>(new Node(*this));}
+	virtual bool Same(const Node*const n)const
+	{
+		//std::cout<<" node comp\n";
+		return L==n->L&&R==n->R&&U==n->U&&D==n->D&&C==n->C;
+	}
 };
 
 class HeadNode : public Node {
 public:
-    int S,N; // size, name
-    HeadNode(int name):S(0),N(name){/*std::cout<<"Head Node "<<this<<"\n";*/}
-    virtual ~HeadNode(){/*std::cout<<"~HeadNode "<<this<<"\n";*/}
-    Node*LinkU(Node*p);
-    // node integrity test support
-    virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<HeadNode>(new HeadNode(*this));}
-    virtual bool Same(const Node*const n)const // must have same signature, so casting later on...
-    {
-        //std::cout<<" HeadNode comp";
-        auto h=dynamic_cast<const HeadNode*const>(n);
-        return h&&Node::Same(n)&&S==h->S&&N==h->N;
-    }
+	int S,N; // size, name
+	HeadNode(int name):S(0),N(name){/*std::cout<<"Head Node "<<this<<"\n";*/}
+	virtual ~HeadNode(){/*std::cout<<"~HeadNode "<<this<<"\n";*/}
+	Node*LinkU(Node*p);
+	// node integrity test support
+	virtual std::unique_ptr<Node>Clone()const{return std::unique_ptr<HeadNode>(new HeadNode(*this));}
+	virtual bool Same(const Node*const n)const // must have same signature, so casting later on...
+	{
+		//std::cout<<" HeadNode comp";
+		auto h=dynamic_cast<const HeadNode*const>(n);
+		return h&&Node::Same(n)&&S==h->S&&N==h->N;
+	}
 };
 
 // The implementation of the algorithm uses raw pointers. Node lifetime
 // is managed by unique_ptr vector.
 
 class RaiiNodes {
-    std::vector<std::unique_ptr<Node>>v;
+	std::vector<std::unique_ptr<Node>>v;
 public:
-    void V(Node*p){v.push_back(std::unique_ptr<Node>(p));}
-    HeadNode*GetHead(int col); // col is -1 for header head
-    size_t Size(){return v.size();}
-    // node integrity test support
-    std::vector<std::unique_ptr<Node>> Snap();
-    bool Comp(std::vector<std::unique_ptr<Node>>&x);
+	void V(Node*p){v.push_back(std::unique_ptr<Node>(p));}
+	HeadNode*GetHead(int col); // col is -1 for header head
+	size_t Size(){return v.size();}
+	// node integrity test support
+	std::vector<std::unique_ptr<Node>> Snap();
+	bool Comp(std::vector<std::unique_ptr<Node>>&x);
 };
 
 class DLX:public Solver{
-    RaiiNodes n; // allocation bucket
-    Node*rowStart;
-    void Search(HeadNode*h,int k,std::vector<Node*>&O);
-    void ShowSolution(int k,std::vector<Node*>&O);
-    HeadNode*ChooseColumn(HeadNode*hh);
-    void Cover(HeadNode*c);
-    void Uncover(HeadNode*c);
-    void(*Notify)(Event);
-    bool show;
+	RaiiNodes n; // allocation bucket
+	Node*rowStart;
+	void Search(HeadNode*h,int k,std::vector<Node*>&O);
+	void ShowSolution(int k,std::vector<Node*>&O);
+	HeadNode*ChooseColumn(HeadNode*hh);
+	void Cover(HeadNode*c);
+	void Uncover(HeadNode*c);
+	void(*Notify)(Event);
+	bool show;
 public:
-    DLX(){} // should not need to define this?
-    void Init(int pc, int sc, void(*CallBack)(Event));
-    void Row(int col);
-    void Col(int col);
-    void Solve(bool showSoln=true);
-    DLX&operator=(const DLX&); // no assignment
-    DLX(const DLX&); // no copy constructor
+	DLX(){} // should not need to define this?
+	void Init(int pc, int sc, void(*CallBack)(Event));
+	void Row(int col);
+	void Col(int col);
+	void Solve(bool showSoln=true);
+	DLX&operator=(const DLX&); // no assignment
+	DLX(const DLX&); // no copy constructor
 };
 

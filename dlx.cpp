@@ -16,54 +16,54 @@ using namespace std;
 
 Node*Node::LinkL(Node*p) // place node in same row before this item
 {
-    p->R=this;
-    p->L=this->L;
-    this->L->R=p;
-    this->L=p;
-    return p;
+	p->R=this;
+	p->L=this->L;
+	this->L->R=p;
+	this->L=p;
+	return p;
 }
 Node*HeadNode::LinkU(Node*p) // place node in same column before this item
 {
-    p->C=this;
-    ++S;
-    p->D=this;
-    p->U=this->U;
-    this->U->D=p;
-    this->U=p;
-    return p;    
+	p->C=this;
+	++S;
+	p->D=this;
+	p->U=this->U;
+	this->U->D=p;
+	this->U=p;
+	return p;    
 }
 HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
 {
-    // verification overhead, avoid using this at solve time
-    auto ph=dynamic_cast<HeadNode*>(v[col+1].get());
-    if(!ph){throw(runtime_error("failed GetHead, constraint index may be out of range"));}
-    if(col!=ph->N){throw(runtime_error("bad Head node name"));}
-    return ph;
+	// verification overhead, avoid using this at solve time
+	auto ph=dynamic_cast<HeadNode*>(v[col+1].get());
+	if(!ph){throw(runtime_error("failed GetHead, constraint index may be out of range"));}
+	if(col!=ph->N){throw(runtime_error("bad Head node name"));}
+	return ph;
 }
 
 vector<std::unique_ptr<Node>>RaiiNodes::Snap()
 {
-    vector<unique_ptr<Node>> x;
-    for(auto&i:v)
-    {
-        x.push_back(i.get()->Clone());
-    }
-    return x;
+	vector<unique_ptr<Node>> x;
+	for(auto&i:v)
+	{
+		x.push_back(i.get()->Clone());
+	}
+	return x;
 }
 
 //#include <typeinfo>
 bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)
 {
-    if(x.size()!=v.size()){return false;}
-    for(size_t i(0);i<x.size();++i)
-    {
-        //cout<<"types: "<<typeid(*x[i].get()).name()<<" "<<typeid(*v[i].get()).name()<<"\n";
-        if(!x[i].get()->Same(v[i].get()))
-        {
-            return false;
-        }
-    }
-    return true;
+	if(x.size()!=v.size()){return false;}
+	for(size_t i(0);i<x.size();++i)
+	{
+		//cout<<"types: "<<typeid(*x[i].get()).name()<<" "<<typeid(*v[i].get()).name()<<"\n";
+		if(!x[i].get()->Same(v[i].get()))
+		{
+			return false;
+		}
+	}
+	return true;
 }
 
 // Generalized Exact Cover
@@ -84,25 +84,25 @@ bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)
 
 void DLX::Init(int pc, int sc, void(*CallBack)(Event))
 {
-    Notify=CallBack;
-    
-    n.V(new HeadNode(-1)); // head node of head nodes
-    for(int i(0);i<pc;++i) // primary constraint head nodes
-    {
-        n.V(n.GetHead(-1)->LinkL(new HeadNode(i))); // link on raw pointers
-    }
-    for(int i(0);i<sc;++i) // secondary constraint head nodes
-    {
-        n.V(new HeadNode(i+pc)); // no link to peers
-    }
+	Notify=CallBack;
+	
+	n.V(new HeadNode(-1)); // head node of head nodes
+	for(int i(0);i<pc;++i) // primary constraint head nodes
+	{
+		n.V(n.GetHead(-1)->LinkL(new HeadNode(i))); // link on raw pointers
+	}
+	for(int i(0);i<sc;++i) // secondary constraint head nodes
+	{
+		n.V(new HeadNode(i+pc)); // no link to peers
+	}
 }
 void DLX::Row(int col)
 {
-    n.V(rowStart=n.GetHead(col)->LinkU(new Node()));
+	n.V(rowStart=n.GetHead(col)->LinkU(new Node()));
 }
 void DLX::Col(int col)
 {    
-    n.V(rowStart->LinkL(n.GetHead(col)->LinkU(new Node())));
+	n.V(rowStart->LinkL(n.GetHead(col)->LinkU(new Node())));
 }
 
 // Knuth's Algorithm X
@@ -119,20 +119,20 @@ void DLX::Col(int col)
 
 void DLX::Solve(bool showSoln)
 {
-    show=showSoln;
-    
-    cout<<"Solve with "<<n.Size()<<" nodes\n";
-    
-    vector<unique_ptr<Node>>x(n.Snap()); // capture start state
-    if(!n.Comp(x)){throw(runtime_error("early node structure integrity failure"));}
-    
-    vector<Node*>O;
-    Notify(Event::Begin);
-    Search(n.GetHead(-1),0,O);
-    Notify(Event::End);
+	show=showSoln;
+	
+	cout<<"Solve with "<<n.Size()<<" nodes\n";
+	
+	vector<unique_ptr<Node>>x(n.Snap()); // capture start state
+	if(!n.Comp(x)){throw(runtime_error("early node structure integrity failure"));}
+	
+	vector<Node*>O;
+	Notify(Event::Begin);
+	Search(n.GetHead(-1),0,O);
+	Notify(Event::End);
 
-    if(!n.Comp(x)){throw(runtime_error("node structure integrity failure"));}
-    cout<<"Node structure integrity verified.\n";
+	if(!n.Comp(x)){throw(runtime_error("node structure integrity failure"));}
+	cout<<"Node structure integrity verified.\n";
 }
 
 // Algorithm Details
@@ -159,43 +159,43 @@ void DLX::Solve(bool showSoln)
 
 void DLX::Search(HeadNode*h,int k,vector<Node*>&O)
 {
-    if(h==h->R) // no head nodes
-    {
-        Notify(Event::Soln);
-        if(show){ShowSolution(k,O);}
-        return;
-    }
+	if(h==h->R) // no head nodes
+	{
+		Notify(Event::Soln);
+		if(show){ShowSolution(k,O);}
+		return;
+	}
 
-    HeadNode*c=ChooseColumn(h);
-    if(!c)
-    {
-        // discover that there is no way to cover a column in this
-        // search branch, return
-        // | If column c is entirely zero, there are no subalgorithms
-        // | and the process terminates unsuccessfully.
-        // cout<<"unable to cover column with remaining rows\n";
-        return;
-    }
-    
-    //cout<<"Choose column "<<c->N<<" with count "<<c->S<<" level "<<k<<'\n';
-    Cover(c);
-    for(Node*r=c->D;r!=c;r=r->D) // all the rows in column c
-    {
-        O.push_back(r); // implements: set O sub k ← r;
-        for(Node*j=r->R;j!=r;j=j->R) // all the nodes in row
-        {
-            Cover(j->C);
-        }        
+	HeadNode*c=ChooseColumn(h);
+	if(!c)
+	{
+		// discover that there is no way to cover a column in this
+		// search branch, return
+		// | If column c is entirely zero, there are no subalgorithms
+		// | and the process terminates unsuccessfully.
+		// cout<<"unable to cover column with remaining rows\n";
+		return;
+	}
+	
+	//cout<<"Choose column "<<c->N<<" with count "<<c->S<<" level "<<k<<'\n';
+	Cover(c);
+	for(Node*r=c->D;r!=c;r=r->D) // all the rows in column c
+	{
+		O.push_back(r); // implements: set O sub k ← r;
+		for(Node*j=r->R;j!=r;j=j->R) // all the nodes in row
+		{
+			Cover(j->C);
+		}        
 
-        Search(h,k+1,O);
+		Search(h,k+1,O);
 
-        O.pop_back(); // implements: set r ← O sub k and c ← C[r];
-        for(Node*j=r->L;j!=r;j=j->L) // all the nodes in row
-        {
-            Uncover(j->C);
-        }        
-    }
-    Uncover(c);
+		O.pop_back(); // implements: set r ← O sub k and c ← C[r];
+		for(Node*j=r->L;j!=r;j=j->L) // all the nodes in row
+		{
+			Uncover(j->C);
+		}        
+	}
+	Uncover(c);
 }
 
 // | The operation of printing the current solution is easy: We successively print the rows
@@ -204,19 +204,19 @@ void DLX::Search(HeadNode*h,int k,vector<Node*>&O)
 
 void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)
 {
-    cout<<"[\n";
-    
-    for(auto r:O)
-    {
-        cout<<r->C->N<<" ";
-        for(Node*j=r->R;j!=r;j=j->R) // all the nodes in row
-        {
-            cout<<j->C->N<<" ";
-        }
-        cout<<"\n";
-    }
-    
-    cout<<"]\n";
+	cout<<"[\n";
+	
+	for(auto r:O)
+	{
+		cout<<r->C->N<<" ";
+		for(Node*j=r->R;j!=r;j=j->R) // all the nodes in row
+		{
+			cout<<j->C->N<<" ";
+		}
+		cout<<"\n";
+	}
+	
+	cout<<"]\n";
 }
 
 // Minimize Search Branching Factor
@@ -236,16 +236,16 @@ void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)
 
 HeadNode*DLX::ChooseColumn(HeadNode*h) // least covered column
 {
-    // todo: implement as described, without optimization
-    // in: at least one column head node on list
-    HeadNode*j=static_cast<HeadNode*>(h->R); // init first as min
-    if(!j->S){return nullptr;} // early return, no way to cover a column
-    for(HeadNode*p=static_cast<HeadNode*>(j->R);p!=h;p=static_cast<HeadNode*>(p->R))
-    {
-        if(!p->S){return nullptr;} // early return, no way to cover a column
-        if(p->S<j->S){j=p;}
-    }
-    return j;
+	// todo: implement as described, without optimization
+	// in: at least one column head node on list
+	HeadNode*j=static_cast<HeadNode*>(h->R); // init first as min
+	if(!j->S){return nullptr;} // early return, no way to cover a column
+	for(HeadNode*p=static_cast<HeadNode*>(j->R);p!=h;p=static_cast<HeadNode*>(p->R))
+	{
+		if(!p->S){return nullptr;} // early return, no way to cover a column
+		if(p->S<j->S){j=p;}
+	}
+	return j;
 }
 
 // Covering a Column
@@ -260,22 +260,22 @@ HeadNode*DLX::ChooseColumn(HeadNode*h) // least covered column
 
 void DLX::Cover(HeadNode*c)
 {
-    //cout<<"Covering column "<<c->N<<" with count "<<c->S<<'\n';
-    // remove self from head node list
-    c->R->L=c->L;
-    c->L->R=c->R;
-    // process column
-    for(Node*i=c->D;i!=c;i=i->D) // all rows having nodes in this column
-    {
-        for(Node*j=i->R;j!=i;j=j->R) // all _other_ nodes in this row
-        {
-            // remove node from column
-            j->D->U=j->U;
-            j->U->D=j->D;
-            // inform column head that it has one less node
-            --(j->C->S);
-        }
-    }
+	//cout<<"Covering column "<<c->N<<" with count "<<c->S<<'\n';
+	// remove self from head node list
+	c->R->L=c->L;
+	c->L->R=c->R;
+	// process column
+	for(Node*i=c->D;i!=c;i=i->D) // all rows having nodes in this column
+	{
+		for(Node*j=i->R;j!=i;j=j->R) // all _other_ nodes in this row
+		{
+			// remove node from column
+			j->D->U=j->U;
+			j->U->D=j->D;
+			// inform column head that it has one less node
+			--(j->C->S);
+		}
+	}
 }
 
 // Uncovering a Column
@@ -289,24 +289,24 @@ void DLX::Cover(HeadNode*c)
 
 void DLX::Uncover(HeadNode*c)
 {
-    //cout<<"Uncovering column "<<c->N<<" with count "<<c->S<<'\n';
-    // operations carried out in reverse order of Cover()
+	//cout<<"Uncovering column "<<c->N<<" with count "<<c->S<<'\n';
+	// operations carried out in reverse order of Cover()
 
-    // process column
-    for(Node*i=c->U;i!=c;i=i->U) // all rows having nodes in this column, reverse order
-    {
-        for(Node*j=i->L;j!=i;j=j->L) // all _other_ nodes in this row, reverse order
-        {
-            // inform column head that its node came back
-            ++(j->C->S);
-            // insert node back into column
-            j->D->U=j;
-            j->U->D=j;
-        }
-    }
-    // reinsert self into head node list
-    c->R->L=c;
-    c->L->R=c;
+	// process column
+	for(Node*i=c->U;i!=c;i=i->U) // all rows having nodes in this column, reverse order
+	{
+		for(Node*j=i->L;j!=i;j=j->L) // all _other_ nodes in this row, reverse order
+		{
+			// inform column head that its node came back
+			++(j->C->S);
+			// insert node back into column
+			j->D->U=j;
+			j->U->D=j;
+		}
+	}
+	// reinsert self into head node list
+	c->R->L=c;
+	c->L->R=c;
 }
 
 // consider:
