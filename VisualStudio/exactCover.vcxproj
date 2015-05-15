@@ -19,12 +19,17 @@
     <ClInclude Include="..\Solver.h" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\CreateQueensTests.txt" />
+    <Text Include="..\CreateYpentominoTests.txt" />
     <Text Include="..\readme.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\boardPng.py" />
     <None Include="..\CreateQueensData.py" />
     <None Include="..\CreateYpentominoData.py" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\ypent_27_10.png" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{8093A234-FC16-4473-867E-947E554AFAD1}</ProjectGuid>

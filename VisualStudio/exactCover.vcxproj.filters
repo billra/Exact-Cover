@@ -12,6 +12,12 @@
     <Filter Include="Python Files">
       <UniqueIdentifier>{ef7b6c9e-3c3a-443a-bb3b-521102a0ebb9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Python Tests">
+      <UniqueIdentifier>{fec431a1-4241-496e-87a0-0f8acf543adb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Docs">
+      <UniqueIdentifier>{525a9e69-c412-42ca-ad41-ba45b6387ac4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\main.cpp">
@@ -41,6 +47,19 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\readme.md" />
+    <Text Include="..\CreateQueensTests.txt">
+      <Filter>Python Tests</Filter>
+    </Text>
+    <Text Include="..\CreateYpentominoTests.txt">
+      <Filter>Python Tests</Filter>
+    </Text>
+    <Text Include="..\readme.md">
+      <Filter>Docs</Filter>
+    </Text>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="..\ypent_27_10.png">
+      <Filter>Docs</Filter>
+    </Image>
   </ItemGroup>
 </Project>
