@@ -35,7 +35,7 @@ Node*HeadNode::LinkU(Node*p) // place node in same column before this item
 HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
 {
 	// verification overhead, avoid using this at solve time
-	auto ph=dynamic_cast<HeadNode*>(v[col+1].get());
+	auto ph(dynamic_cast<HeadNode*>(v[col+1].get()));
 	if(!ph){throw(runtime_error("failed GetHead, constraint index may be out of range"));}
 	if(col!=ph->N){throw(runtime_error("bad Head node name"));}
 	return ph;
@@ -44,7 +44,7 @@ HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
 vector<std::unique_ptr<Node>>RaiiNodes::Snap()
 {
 	vector<unique_ptr<Node>> x;
-	for(auto&i:v)
+	for(const auto&i:v)
 	{
 		x.push_back(i.get()->Clone());
 	}
@@ -82,7 +82,7 @@ bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)
 //
 // see insertion of secondary constraint head nodes below
 
-void DLX::Init(int pc, int sc, void(*CallBack)(Event))
+void DLX::Init(const int pc, const int sc, void(*CallBack)(Event))
 {
 	Notify=CallBack;
 	
@@ -96,11 +96,11 @@ void DLX::Init(int pc, int sc, void(*CallBack)(Event))
 		n.V(new HeadNode(i+pc)); // no link to peers
 	}
 }
-void DLX::Row(int col)
+void DLX::Row(const int col)
 {
 	n.V(rowStart=n.GetHead(col)->LinkU(new Node()));
 }
-void DLX::Col(int col)
+void DLX::Col(const int col)
 {    
 	n.V(rowStart->LinkL(n.GetHead(col)->LinkU(new Node())));
 }
@@ -117,7 +117,7 @@ void DLX::Col(int col)
 // |             delete row i from matrix A.
 // | Repeat this algorithm recursively on the reduced matrix A.
 
-void DLX::Solve(bool showSoln)
+void DLX::Solve(const bool showSoln)
 {
 	show=showSoln;
 	
@@ -206,7 +206,7 @@ void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)
 {
 	cout<<"[\n";
 	
-	for(auto r:O)
+	for(const auto& r:O)
 	{
 		cout<<r->C->N<<" ";
 		for(Node*j=r->R;j!=r;j=j->R) // all the nodes in row

@@ -13,9 +13,9 @@
 using namespace std;
 
 // observer pattern
-void CallBack(Solver::Event e)
+void CallBack(const Solver::Event e)
 {
-	static chrono::high_resolution_clock::time_point begin,soln,end;
+	static chrono::high_resolution_clock::time_point begin;
 	static bool first(true);
 	static int count(0);
 	
@@ -29,16 +29,16 @@ void CallBack(Solver::Event e)
 		++count;
 		if(first)
 		{
-			soln=chrono::high_resolution_clock::now();
+			const auto soln(chrono::high_resolution_clock::now());
 			first=false;
-			auto d = chrono::duration_cast<chrono::milliseconds>(soln-begin);
+			const auto d(chrono::duration_cast<chrono::milliseconds>(soln-begin));
 			cout<<"time to first solution: "<<d.count()/1000.<<" seconds\n";
 		}
 	}
 	if(e==Solver::Event::End)
 	{
-		end=chrono::high_resolution_clock::now();
-		auto d = chrono::duration_cast<chrono::milliseconds>(end-begin);
+		const auto end(chrono::high_resolution_clock::now());
+		const auto d(chrono::duration_cast<chrono::milliseconds>(end-begin));
 		cout<<count<<" solution(s) found, full solve time: "<<d.count()/1000.<<" seconds\n";
 	}
 }

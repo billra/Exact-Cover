@@ -84,11 +84,11 @@ class DLX:public Solver{
 	bool show;
 public:
 	DLX(){} // should not need to define this?
-	void Init(int pc, int sc, void(*CallBack)(Event));
-	void Row(int col);
-	void Col(int col);
-	void Solve(bool showSoln=true);
-	DLX&operator=(const DLX&); // no assignment
-	DLX(const DLX&); // no copy constructor
+	void Init(const int pc, const int sc, void(*CallBack)(Event)) override;
+	void Row(const int col) override;
+	void Col(const int col) override;
+	void Solve(const bool showSoln=true) override;
+	DLX&operator=(const DLX&)=delete; // no assignment
+	DLX(const DLX&)=delete; // no copy constructor
 };
 
