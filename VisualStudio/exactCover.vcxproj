@@ -19,7 +19,7 @@
     <ClInclude Include="..\Solver.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\readme.txt" />
+    <Text Include="..\readme.md" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\boardPng.py" />

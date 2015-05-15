@@ -30,9 +30,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="..\readme.txt" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="..\boardPng.py">
       <Filter>Python Files</Filter>
     </None>
@@ -42,5 +39,8 @@
     <None Include="..\CreateYpentominoData.py">
       <Filter>Python Files</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\readme.md" />
   </ItemGroup>
 </Project>
