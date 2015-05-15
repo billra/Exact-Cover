@@ -46,21 +46,22 @@ void CallBack(Solver::Event e)
 void readInput(Solver&solver)
 {
     string str;
-    while(cin.good())
-    {
-        getline(cin,str);
-        if(str.length()&&'['==str[0]){break;}
-    }
-    getline(cin,str);
-    stringstream ss(str);
-    int pri,sec;
-    ss>>pri>>sec;
-    if(ss.fail()){throw(runtime_error("fail reading constraint counts"));}
-    cout<<"primary constraints: "<<pri<<", "
-        <<"secondary constraints: "<<sec<<'\n';
+	{ // read constraint counts (columns)
+		while (cin.good())
+		{
+			getline(cin, str);
+			if (str.length() && '[' == str[0]) { break; }
+		}
+		getline(cin, str);
+		stringstream ss(str);
+		int pri, sec;
+		ss >> pri >> sec;
+		if (ss.fail()) { throw(runtime_error("fail reading constraint counts")); }
+		cout << "primary constraints: " << pri << ", "
+			<< "secondary constraints: " << sec << '\n';
 
-    solver.Init(pri,sec,CallBack);    
-
+		solver.Init(pri, sec, CallBack);
+	}
     while(cin.good()) // read lines (rows)
     {
         getline(cin,str);
