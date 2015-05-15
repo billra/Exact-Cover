@@ -31,6 +31,9 @@ CreateYpentominoData.py 15 | solve : show solutions to a 15x15 board
 Create png of the first solution:
 CreateYpentominoData.py 10 14 | solve | boardPng.py 10 14
 
+windows: (VS2015)
+CreateYpentominoData.py 27 10 | VisualStudio\Release\exactCover.exe | boardPng.py 27 10
+
 --------------
 Cross Platform
 --------------
