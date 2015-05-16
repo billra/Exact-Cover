@@ -34,9 +34,10 @@ Node*HeadNode::LinkU(Node*p) // place node in same column before this item
 }
 HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
 {
-	// verification overhead, avoid using this at solve time
+	// verification overhead, do not use at solve time
+	if((int)v.size()-1<col+1){throw(runtime_error("GetHead index out of range"));}
 	auto ph(dynamic_cast<HeadNode*>(v[col+1].get()));
-	if(!ph){throw(runtime_error("failed GetHead, constraint index may be out of range"));}
+	if(!ph){throw(runtime_error("failed HeadNode dynamic cast"));}
 	if(col!=ph->N){throw(runtime_error("bad Head node name"));}
 	return ph;
 }
