@@ -84,10 +84,10 @@ class DLX:public Solver{
 	bool show;
 public:
 	DLX(){} // should not need to define this?
-	void Init(const int pc, const int sc, std::function<void(Event)>CallBack) override;
+	void Init(const int pc, const int sc) override;
 	void Row(const int col) override;
 	void Col(const int col) override;
-	void Solve(const bool showSoln=true) override;
+	void Solve(const bool showSoln, std::function<void(Event)>CallBack) override;
 	DLX&operator=(const DLX&)=delete; // no assignment
 	DLX(const DLX&)=delete; // no copy constructor
 };

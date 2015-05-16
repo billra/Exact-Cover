@@ -82,10 +82,8 @@ bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)
 //
 // see insertion of secondary constraint head nodes below
 
-void DLX::Init(const int pc, const int sc, std::function<void(Event)>CallBack)
+void DLX::Init(const int pc, const int sc)
 {
-	Notify=CallBack;
-	
 	n.V(new HeadNode(-1)); // head node of head nodes
 	for(int i(0);i<pc;++i) // primary constraint head nodes
 	{
@@ -117,10 +115,11 @@ void DLX::Col(const int col)
 // |             delete row i from matrix A.
 // | Repeat this algorithm recursively on the reduced matrix A.
 
-void DLX::Solve(const bool showSoln)
+void DLX::Solve(const bool showSoln, std::function<void(Event)>CallBack)
 {
 	show=showSoln;
-	
+	Notify = CallBack;
+
 	cout<<"Solve with "<<n.Size()<<" nodes\n";
 	
 	vector<unique_ptr<Node>>x(n.Snap()); // capture start state

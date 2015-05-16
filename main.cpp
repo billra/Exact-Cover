@@ -60,7 +60,7 @@ void readInput(Solver&solver)
 		cout << "primary constraints: " << pri << ", "
 			<< "secondary constraints: " << sec << '\n';
 
-		solver.Init(pri, sec, CallBack);
+		solver.Init(pri, sec);
 	}
 	while(cin.good()) // read lines (rows)
 	{
@@ -91,7 +91,7 @@ int main(int argc, char *argv[])
 		// todo: choose a solver
 		DLX solver;
 		readInput(solver);
-		solver.Solve(!quiet);
+		solver.Solve(!quiet, CallBack);
 	}
 	catch(exception const&e)
 	{
