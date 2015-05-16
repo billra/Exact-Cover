@@ -46,7 +46,7 @@ vector<std::unique_ptr<Node>>RaiiNodes::Snap()
 	vector<unique_ptr<Node>> x;
 	for(const auto&i:v)
 	{
-		x.push_back(i.get()->Clone());
+		x.emplace_back(i.get()->Clone());
 	}
 	return x;
 }
@@ -181,7 +181,7 @@ void DLX::Search(HeadNode*h,int k,vector<Node*>&O)
 	Cover(c);
 	for(Node*r=c->D;r!=c;r=r->D) // all the rows in column c
 	{
-		O.push_back(r); // implements: set O sub k ← r;
+		O.emplace_back(r); // implements: set O sub k ← r;
 		for(Node*j=r->R;j!=r;j=j->R) // all the nodes in row
 		{
 			Cover(j->C);

@@ -64,7 +64,7 @@ public:
 class RaiiNodes {
 	std::vector<std::unique_ptr<Node>>v;
 public:
-	void V(Node*p){v.push_back(std::unique_ptr<Node>(p));}
+	void V(Node*p){v.emplace_back(std::unique_ptr<Node>(p));}
 	HeadNode*GetHead(int col); // col is -1 for header head
 	size_t Size(){return v.size();}
 	// node integrity test support
