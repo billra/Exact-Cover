@@ -80,11 +80,11 @@ class DLX:public Solver{
 	HeadNode*ChooseColumn(HeadNode*hh);
 	void Cover(HeadNode*c);
 	void Uncover(HeadNode*c);
-	void(*Notify)(Event);
+	std::function<void(Event)>Notify;
 	bool show;
 public:
 	DLX(){} // should not need to define this?
-	void Init(const int pc, const int sc, void(*CallBack)(Event)) override;
+	void Init(const int pc, const int sc, std::function<void(Event)>CallBack) override;
 	void Row(const int col) override;
 	void Col(const int col) override;
 	void Solve(const bool showSoln=true) override;

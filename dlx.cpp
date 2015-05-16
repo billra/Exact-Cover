@@ -82,7 +82,7 @@ bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)
 //
 // see insertion of secondary constraint head nodes below
 
-void DLX::Init(const int pc, const int sc, void(*CallBack)(Event))
+void DLX::Init(const int pc, const int sc, std::function<void(Event)>CallBack)
 {
 	Notify=CallBack;
 	
