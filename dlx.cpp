@@ -17,9 +17,9 @@ using namespace std;
 Node*Node::LinkL(Node*p) // place node in same row before this item
 {
 	p->R=this;
-	p->L=this->L;
-	this->L->R=p;
-	this->L=p;
+	p->L=L;
+	L->R=p;
+	L=p;
 	return p;
 }
 Node*HeadNode::LinkU(Node*p) // place node in same column before this item
@@ -27,9 +27,9 @@ Node*HeadNode::LinkU(Node*p) // place node in same column before this item
 	p->C=this;
 	++S;
 	p->D=this;
-	p->U=this->U;
-	this->U->D=p;
-	this->U=p;
+	p->U=U;
+	U->D=p;
+	U=p;
 	return p;    
 }
 HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
