@@ -42,7 +42,7 @@ HeadNode*RaiiNodes::GetHead(int col) // col is -1 for header head
 	return ph;
 }
 
-vector<std::unique_ptr<Node>>RaiiNodes::Snap()
+vector<std::unique_ptr<Node>>RaiiNodes::Snap()const
 {
 	vector<unique_ptr<Node>> x;
 	for(const auto&i:v)
@@ -53,7 +53,7 @@ vector<std::unique_ptr<Node>>RaiiNodes::Snap()
 }
 
 //#include <typeinfo>
-bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)
+bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)const
 {
 	if(x.size()!=v.size()){return false;}
 	for(size_t i(0);i<x.size();++i)
@@ -202,7 +202,7 @@ void DLX::Search(HeadNode*h,int k,vector<Node*>&O)
 // | containing O sub 0, O sub 1, ..., O sub k−1 , where the row containing data object O is
 // | printed by printing N[C[O]], N[C[R[O]]], N[C[R[R[O]]]], etc.
 
-void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)
+void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)const
 {
 	cout<<"[\n";
 	
@@ -234,7 +234,7 @@ void DLX::ShowSolution(int /*k*/,std::vector<Node*>&O)
 // column has the same number of child nodes, so this implementation could be
 // improved as we always start with the first column.
 
-HeadNode*DLX::ChooseColumn(HeadNode*h) // least covered column
+HeadNode*DLX::ChooseColumn(HeadNode*h)const // least covered column
 {
 	// todo: implement as described, without optimization
 	// in: at least one column head node on list

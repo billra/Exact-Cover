@@ -66,22 +66,22 @@ class RaiiNodes {
 public:
 	void V(Node*p){v.emplace_back(std::unique_ptr<Node>(p));}
 	HeadNode*GetHead(int col); // col is -1 for header head
-	size_t Size(){return v.size();}
+	size_t Size()const{return v.size();}
 	// node integrity test support
-	std::vector<std::unique_ptr<Node>> Snap();
-	bool Comp(std::vector<std::unique_ptr<Node>>&x);
+	std::vector<std::unique_ptr<Node>> Snap()const;
+	bool Comp(std::vector<std::unique_ptr<Node>>&x)const;
 };
 
 class DLX:public Solver{
 	RaiiNodes n; // allocation bucket
 	Node*rowStart;
-	void Search(HeadNode*h,int k,std::vector<Node*>&O);
-	void ShowSolution(int k,std::vector<Node*>&O);
-	HeadNode*ChooseColumn(HeadNode*hh);
-	void Cover(HeadNode*c);
-	void Uncover(HeadNode*c);
 	std::function<void(Event)>Notify;
 	bool show;
+	void Search(HeadNode*h,int k,std::vector<Node*>&O);
+	void ShowSolution(int k,std::vector<Node*>&O)const;
+	HeadNode*ChooseColumn(HeadNode*hh)const;
+	void Cover(HeadNode*c);
+	void Uncover(HeadNode*c);
 public:
 	DLX(){} // should not need to define this?
 	void Init(const int pc, const int sc) override;
