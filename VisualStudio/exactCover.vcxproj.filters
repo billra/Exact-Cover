@@ -56,6 +56,9 @@
     <Text Include="..\readme.md">
       <Filter>Docs</Filter>
     </Text>
+    <Text Include="..\pent_11_20.txt">
+      <Filter>Docs</Filter>
+    </Text>
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\ypent_27_10.png">

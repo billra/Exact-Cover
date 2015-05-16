@@ -5,6 +5,7 @@
 #include <iomanip>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <stdexcept>
 #include <memory>
 #include <ctime>
@@ -43,16 +44,16 @@ void CallBack(const Solver::Event e)
 	}
 }
 
-void readInput(Solver&solver)
+void readInput(Solver&solver, istream&is)
 {
 	string str;
 	{ // read constraint counts (columns)
-		while (cin.good())
+		while (is.good())
 		{
-			getline(cin, str);
+			getline(is, str);
 			if (str.length() && '[' == str[0]) { break; }
 		}
-		getline(cin, str);
+		getline(is, str);
 		stringstream ss(str);
 		int pri, sec;
 		ss >> pri >> sec;
@@ -62,10 +63,14 @@ void readInput(Solver&solver)
 
 		solver.Init(pri, sec);
 	}
-	while(cin.good()) // read lines (rows)
+	while(is.good()) // read lines (rows)
 	{
-		getline(cin,str);
-		if(str.length()&&str[0]==']'){return;}
+		getline(is,str);
+		if(str.length()&&str[0]==']')
+		{
+			// while (is.good()) { getline(is, str); } // empty stream
+			return;
+		}
 		stringstream ss(str);
 		for(bool first(true);!ss.eof();first=false) // read numbers (columns)
 		{
@@ -80,24 +85,40 @@ void readInput(Solver&solver)
 
 int main(int argc, char *argv[])
 {
-	string flag(argc>1?argv[1]:"");
+	// 1st parameter: -q for quiet
+	string flag(argc > 1 ? argv[1] : "");
 	flag.resize(2);
-	const bool quiet("-q"==flag);
-	
-	cout<<"Generalized Exact Cover Solver\n"
-		<<"reading input...\n";
+	const bool quiet("-q" == flag);
+
+	// 2nd parameter: name of input file, blank or cin for cin
+	const string inputsrc(argc > 2 ? argv[2] : "cin");
+
+	cout << "Generalized Exact Cover Solver\n"
+		<< "reading input from " << inputsrc << "...\n";
 	try
 	{
-		// todo: choose a solver
-		DLX solver;
-		readInput(solver);
+		DLX solver; // todo: choose a solver
+
+		if ("cin" == inputsrc)
+		{
+			readInput(solver, cin);
+		}
+		else // input from file
+		{
+			filebuf fb;
+			fb.open(inputsrc, ios::in);
+			istream is(&fb);
+			readInput(solver, is);
+			fb.close();
+		}
+
 		solver.Solve(!quiet, CallBack);
 	}
-	catch(exception const&e)
+	catch (exception const&e)
 	{
-		cout<<"Exception: "<<e.what()<<'\n';
-	}        
-	cout<<"done.\n";
+		cout << "Exception: " << e.what() << '\n';
+	}
+	cout << "done.\n";
 
-	return(0);
+	return 0;
 }

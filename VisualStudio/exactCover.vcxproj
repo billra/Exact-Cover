@@ -25,6 +25,7 @@
   <ItemGroup>
     <Text Include="..\CreateQueensTests.txt" />
     <Text Include="..\CreateYpentominoTests.txt" />
+    <Text Include="..\pent_11_20.txt" />
     <Text Include="..\readme.md" />
   </ItemGroup>
   <ItemGroup>
@@ -125,6 +126,7 @@
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <SDLCheck>true</SDLCheck>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <CallingConvention>Cdecl</CallingConvention>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
