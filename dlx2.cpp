@@ -9,20 +9,16 @@ using namespace std;
 
 Node2*Node2::LinkL(Node2*p) // place node in same row before this item
 {
-	p->R=this;
-	p->L=L;
-	L->R=p;
-	L=p;
+	p->R=this; p->L=L;
+	L->R=p;	L=p;
 	return p;
 }
 Node2*HeadNode2::LinkU(Node2*p) // place node in same column before this item
 {
-	p->C=this;
 	++S;
-	p->D=this;
-	p->U=U;
-	U->D=p;
-	U=p;
+	p->C = this;
+	p->D=this; p->U=U;
+	U->D=p;	U=p;
 	return p;    
 }
 HeadNode2*RaiiNodes2::GetHead(int col) // col is -1 for header head
@@ -45,7 +41,6 @@ vector<std::unique_ptr<Node2>>RaiiNodes2::Snap()const
 	return x;
 }
 
-//#include <typeinfo>
 bool RaiiNodes2::Comp(vector<std::unique_ptr<Node2>>&x)const
 {
 	if(x.size()!=v.size()){return false;}
@@ -59,6 +54,7 @@ bool RaiiNodes2::Comp(vector<std::unique_ptr<Node2>>&x)const
 	return true;
 }
 
+// 1. todo: make contiguous head array to increase locality of reference
 void DLX2::Init(const int pc, const int sc)
 {
 	n.V(new HeadNode2(-1)); // head node of head nodes
@@ -71,6 +67,7 @@ void DLX2::Init(const int pc, const int sc)
 		n.V(new HeadNode2(i+pc)); // no link to peers
 	}
 }
+// 2. todo: make contiguous nodes in tiles
 void DLX2::Row(const int col)
 {
 	n.V(rowStart=n.GetHead(col)->LinkU(new Node2()));
@@ -125,8 +122,6 @@ recurse:
 	{
 		// discover that there is no way to cover a column in this
 		// search branch, return
-		// | If column c is entirely zero, there are no subalgorithms
-		// | and the process terminates unsuccessfully.
 		goto pop; // was: return;
 	}
 	
@@ -147,7 +142,7 @@ recurse:
 		r = rStack[--irStack];
 		c = r->C;
 
-		Soln.pop_back(); // implements: set r ← Soln sub k and c ← C[r];
+		Soln.pop_back();
 		for(Node2*j=r->L;j!=r;j=j->L) // all the nodes in row
 		{
 			Uncover(j->C);
@@ -155,38 +150,6 @@ recurse:
 	}
 	Uncover(c);
 	goto pop; // was: default return
-}
-
-void DLX2::ShowSolution(const std::vector<Node2*>&O)const
-{
-	cout<<"[\n";
-	
-	for(const auto& r:O)
-	{
-		cout<<r->C->N<<" ";
-		for(Node2*j=r->R;j!=r;j=j->R) // all the nodes in row
-		{
-			cout<<j->C->N<<" ";
-		}
-		cout<<"\n";
-	}
-	
-	cout<<"]\n";
-}
-
-
-HeadNode2*DLX2::ChooseColumn(HeadNode2*const hh)const // least covered column
-{
-	// todo: implement as described, without optimization
-	// in: at least one column head node on list
-	HeadNode2*j=static_cast<HeadNode2*>(hh->R); // init first as min
-	if(!j->S){return nullptr;} // early return, no way to cover a column
-	for(HeadNode2*p=static_cast<HeadNode2*>(j->R);p!=hh;p=static_cast<HeadNode2*>(p->R))
-	{
-		if(!p->S){return nullptr;} // early return, no way to cover a column
-		if(p->S<j->S){j=p;}
-	}
-	return j;
 }
 
 void DLX2::Cover(HeadNode2*const c)
@@ -215,7 +178,7 @@ void DLX2::Uncover(HeadNode2*const c)
 	// process column
 	for(Node2*i=c->U;i!=c;i=i->U) // all rows having nodes in this column, reverse order
 	{
-		for(Node2*j=i->L;j!=i;j=j->L) // all _other_ nodes in this row, reverse order
+		for (Node2*j = i->R; j != i; j = j->R) // all _other_ nodes in this row (reverse order actuall not necessary!)
 		{
 			// inform column head that its node came back
 			++(j->C->S);
@@ -227,6 +190,37 @@ void DLX2::Uncover(HeadNode2*const c)
 	// reinsert self into head node list
 	c->R->L=c;
 	c->L->R=c;
+}
+
+HeadNode2*DLX2::ChooseColumn(HeadNode2*const hh)const // least covered column
+{
+	// todo: implement as described, without optimization
+	// in: at least one column head node on list
+	HeadNode2*j = static_cast<HeadNode2*>(hh->R); // init first as min
+	if (!j->S) { return nullptr; } // early return, no way to cover a column
+	for (HeadNode2*p = static_cast<HeadNode2*>(j->R); p != hh; p = static_cast<HeadNode2*>(p->R))
+	{
+		if (!p->S) { return nullptr; } // early return, no way to cover a column
+		if (p->S<j->S) { j = p; }
+	}
+	return j;
+}
+
+void DLX2::ShowSolution(const std::vector<Node2*>&O)const
+{
+	cout << "[\n";
+
+	for (const auto& r : O)
+	{
+		cout << r->C->N << " ";
+		for (Node2*j = r->R; j != r; j = j->R) // all the nodes in row
+		{
+			cout << j->C->N << " ";
+		}
+		cout << "\n";
+	}
+
+	cout << "]\n";
 }
 
 // consider:
