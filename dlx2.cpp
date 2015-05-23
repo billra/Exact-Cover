@@ -1,18 +1,11 @@
-// classic dancing links solver implementation
+// modified dancing links solver implementation
 // Bill Ola Rasmussen
-#include "dlx2.h"
 
-// todo: cleanup
-#include <assert.h>
-#include <string>
-#include <sstream>
+#include "dlx2.h"
 #include <stdexcept>
 #include <memory>
-#include <limits>
+#include <iostream>
 using namespace std;
-
-// note: comments marked with '|' indicate text from the paper
-// http://www-cs-faculty.stanford.edu/~uno/papers/dancing-color.ps.gz
 
 Node2*Node2::LinkL(Node2*p) // place node in same row before this item
 {
@@ -67,22 +60,6 @@ bool RaiiNodes2::Comp(vector<std::unique_ptr<Node2>>&x)const
 	return true;
 }
 
-// Generalized Exact Cover
-// -----------------------
-// | We can handle this extra complication by generalizing the exact cover problem. Instead
-// | of requiring all columns of a given 0-1 matrix to be covered by disjoint rows, we
-// | will distinguish two kinds of columns: primary and secondary. The generalized problem
-// | asks for a set of rows that covers every primary column exactly once and every secondary
-// | column at most once.
-// 
-// | Fortunately, we can solve the generalized cover problem by using almost the same
-// | algorithm as before. The only difference is that we initialize the data structure by making
-// | a circular list of the column headers for the primary columns only. The header for each
-// | secondary column should have L and R fields that simply point to itself. The remainder
-// | of the algorithm proceeds exactly as before, so we will still call it algorithm DLX2.
-//
-// see insertion of secondary constraint head nodes below
-
 void DLX2::Init(const int pc, const int sc)
 {
 	n.V(new HeadNode2(-1)); // head node of head nodes
@@ -104,18 +81,6 @@ void DLX2::Col(const int col)
 	n.V(rowStart->LinkL(n.GetHead(col)->LinkU(new Node2())));
 }
 
-// Knuth's Algorithm X
-// -------------------
-// | If A is empty, the problem is solved; terminate successfully.
-// | Otherwise choose a column, c (deterministically).
-// | Choose a row, r, such that A[r,c] = 1 (nondeterministically).
-// | Include r in the partial solution.
-// | For each j such that A[r,j] = 1,
-// |     delete column j from matrix A;
-// |         for each i such that A[i,j] = 1,
-// |             delete row i from matrix A.
-// | Repeat this algorithm recursively on the reduced matrix A.
-
 void DLX2::Solve(const bool showSoln, std::function<void(Event)>CallBack)
 {
 	show=showSoln;
@@ -134,28 +99,6 @@ void DLX2::Solve(const bool showSoln, std::function<void(Event)>CallBack)
 	if(!n.Comp(x)){throw(runtime_error("node structure integrity failure"));}
 	cout<<"Node2 structure integrity verified.\n";
 }
-
-// Algorithm Details
-// -----------------
-// | Our nondeterministic algorithm to find all exact covers can now be cast in the following
-// | explicit, deterministic form as a recursive procedure search(k), which is invoked initially
-// | with k = 0:
-// |     If R[h] = h, print the current solution (see below) and return.
-// |     Otherwise choose a column object c (see below).
-// |     Cover column c (see below).
-// |     For each r ← D[c], D[D[c]] , ..., while r ≠ c,
-// |         set O sub k ← r;
-// |         for each j ← R[r], R[R[r]] , ..., while j ≠ r,
-// |             cover column j (see below);
-// |         search(k + 1);
-// |         set r ← O sub k and c ← C[r];      * note 1
-// |         for each j ← L[r], L[L[r]] , ..., while j ≠ r,
-// |             uncover column j (see below).
-// |     Uncover column c (see below) and return.
-//
-// Note 1: r and c already have these values if recursion is used.
-// This hint might mean that a non recursive implementation is possible
-// if we keep r stacked on O.
 
 void DLX2::Search(HeadNode2*h,int k,vector<Node2*>&O)
 {
@@ -198,10 +141,6 @@ void DLX2::Search(HeadNode2*h,int k,vector<Node2*>&O)
 	Uncover(c);
 }
 
-// | The operation of printing the current solution is easy: We successively print the rows
-// | containing O sub 0, O sub 1, ..., O sub k−1 , where the row containing data object O is
-// | printed by printing N[C[O]], N[C[R[O]]], N[C[R[R[O]]]], etc.
-
 void DLX2::ShowSolution(int /*k*/,std::vector<Node2*>&O)const
 {
 	cout<<"[\n";
@@ -219,20 +158,6 @@ void DLX2::ShowSolution(int /*k*/,std::vector<Node2*>&O)const
 	cout<<"]\n";
 }
 
-// Minimize Search Branching Factor
-// --------------------------------
-// | To choose a column object c, we could simply set c ← R[h]; this is the leftmost
-// | uncovered column. Or if we want to minimize the branching factor, we could set s ← ∞
-// | and then:
-// |     for each j ← R[h], R[R[h]], ..., while j ≠ h,
-// |         if S[j] < s set c ← j and s ← S[j].
-// | Then c is a column with the smallest number of 1s. (The S fields are not needed unless
-// | we want to minimize branching in this way.)
-//
-// Side note: special case for queens, Knuth points out that things go faster
-// if a central locations are chosen first. In the queens case, each primary constraint
-// column has the same number of child nodes, so this implementation could be
-// improved as we always start with the first column.
 
 HeadNode2*DLX2::ChooseColumn(HeadNode2*h)const // least covered column
 {
@@ -247,16 +172,6 @@ HeadNode2*DLX2::ChooseColumn(HeadNode2*h)const // least covered column
 	}
 	return j;
 }
-
-// Covering a Column
-// -----------------
-// | The operation of covering column c is more interesting: It removes c from the header
-// | list and removes all rows in c’s own list from the other column lists they are in.
-// |     Set L[R[c]] ← L[c] and R[L[c]] ← R[c].
-// |     For each i ← D[c], D[D[c]] , ..., while i ≠ c,
-// |         for each j ← R[i], R[R[i]] , ..., while j ≠ i,
-// |             set U[D[j]] ← U [j], D[U[j]] ← D[j],
-// |             and set S[C[j]] ← S[C[j]] − 1.
 
 void DLX2::Cover(HeadNode2*c)
 {
@@ -277,15 +192,6 @@ void DLX2::Cover(HeadNode2*c)
 		}
 	}
 }
-
-// Uncovering a Column
-// -------------------
-// | Here is where the links do their dance:
-// |     For each i = U[c], U[U[c]] , ..., while i ≠ c,
-// |         for each j ← L[i], L[L[i]] , ..., while j ≠ i,
-// |             set S[C[j]] ← S[C[j]] + 1,
-// |             and set U[D[j]] ← j, D[U[[j]] ← j.
-// |     Set L[R[c]] ← c and R[L[c]] ← c.
 
 void DLX2::Uncover(HeadNode2*c)
 {
