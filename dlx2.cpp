@@ -21,15 +21,6 @@ Node2*HeadNode2::LinkU(Node2*p) // place node in same column before this item
 	U->D=p;	U=p;
 	return p;    
 }
-HeadNode2*RaiiNodes2::GetHead(int col) // col is -1 for header head
-{
-	// verification overhead, do not use at solve time
-	if((int)v.size()-1<col+1){throw(runtime_error("GetHead index out of range"));}
-	auto ph(dynamic_cast<HeadNode2*>(v[col+1].get()));
-	if(!ph){throw(runtime_error("failed HeadNode2 dynamic cast"));}
-	if(col!=ph->N){throw(runtime_error("bad Head node name"));}
-	return ph;
-}
 
 vector<std::unique_ptr<Node2>>RaiiNodes2::Snap()const
 {
@@ -54,17 +45,30 @@ bool RaiiNodes2::Comp(vector<std::unique_ptr<Node2>>&x)const
 	return true;
 }
 
-// 1. todo: make contiguous head array to increase locality of reference
+HeadNode2*RaiiNodes2::GetHead(int col) // col is -1 for header head
+{
+	// verification overhead, do not use at solve time
+	if ((int)vh.size() - 1<col + 1) { 
+		throw(runtime_error("GetHead index out of range")); 
+	}
+	HeadNode2* ph(&vh[col + 1]);
+	if (col != ph->N) { 
+		throw(runtime_error("bad Head node name")); 
+	}
+	return ph;
+}
+
+// contiguous head array to increase locality of reference
 void DLX2::Init(const int pc, const int sc)
 {
-	n.V(new HeadNode2(-1)); // head node of head nodes
-	for(int i(0);i<pc;++i) // primary constraint head nodes
+	n.vh.resize(1 + pc + sc); // head node of head nodes, primary constraints, secondary constraints
+	for (vector<HeadNode2>::size_type i(0); i < n.vh.size(); ++i) // all nodes get a name, hh == -1
 	{
-		n.V(n.GetHead(-1)->LinkL(new HeadNode2(i))); // link on raw pointers
+		n.vh[i].N = i - 1;
 	}
-	for(int i(0);i<sc;++i) // secondary constraint head nodes
+	for (int i(1); i < pc; ++i) // circular link primary constraint nodes
 	{
-		n.V(new HeadNode2(i+pc)); // no link to peers
+		n.GetHead(-1)->LinkL(&n.vh[i]);
 	}
 }
 // 2. todo: make contiguous nodes in tiles
@@ -82,7 +86,7 @@ void DLX2::Solve(const bool showSoln, std::function<void(Event)>CallBack)
 	show=showSoln;
 	Notify = CallBack;
 
-	cout<<"DLX2::Solve with "<<n.Size()<<" nodes\n";
+	cout<<"DLX2::Solve with "<<n.vh.size()-1<<" head nodes, " << n.v.size() << " nodes\n";
 	
 	vector<unique_ptr<Node2>>x(n.Snap()); // capture start state
 	if(!n.Comp(x)){throw(runtime_error("early node structure integrity failure"));}
@@ -105,7 +109,7 @@ void DLX2::Search(HeadNode2* const hh,vector<Node2*>&Soln)
 	// because of goto recursion replacement, it is necessary to have a dummy value which is never used
 	HeadNode2*c = hh;
 
-	vector<Node2*>rStack(n.Size(),nullptr); // fixed preallocated buffer
+	vector<Node2*>rStack(n.v.size(),nullptr); // fixed preallocated buffer, space overkill using count of all nodes
 	vector<Node2*>::size_type irStack(0); // index of unused position (i.e. rStack.end() )
 
 recurse:
@@ -196,7 +200,7 @@ HeadNode2*DLX2::ChooseColumn(HeadNode2*const hh)const // least covered column
 {
 	// todo: implement as described, without optimization
 	// in: at least one column head node on list
-	HeadNode2*j = static_cast<HeadNode2*>(hh->R); // init first as min
+	HeadNode2*j = static_cast<HeadNode2*>(hh->R); // initialize first as min
 	if (!j->S) { return nullptr; } // early return, no way to cover a column
 	for (HeadNode2*p = static_cast<HeadNode2*>(j->R); p != hh; p = static_cast<HeadNode2*>(p->R))
 	{

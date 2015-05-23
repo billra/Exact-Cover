@@ -23,8 +23,8 @@ public:
 class HeadNode2 : public Node2 {
 public:
 	int S,N; // size, name
-	HeadNode2(int name):S(0),N(name){}
-	virtual ~HeadNode2(){}
+	HeadNode2(int name):Node2(),S(0),N(name){}
+	HeadNode2():Node2(),S(0){}
 	Node2*LinkU(Node2*p);
 	// node integrity test support
 	std::unique_ptr<Node2>Clone()const override{return std::unique_ptr<HeadNode2>(new HeadNode2(*this));}
@@ -38,12 +38,11 @@ public:
 // The implementation of the algorithm uses raw pointers. Node2 lifetime
 // is managed by unique_ptr vector.
 
-class RaiiNodes2 {
+struct RaiiNodes2 {
 	std::vector<std::unique_ptr<Node2>>v;
-public:
-	void V(Node2*p){v.emplace_back(std::unique_ptr<Node2>(p));}
-	HeadNode2*GetHead(int col); // col is -1 for header head
-	size_t Size()const{return v.size();}
+	std::vector<HeadNode2>vh; // contiguous vector of all head nodes, no heap allocation
+	void V(Node2*p) { v.emplace_back(std::unique_ptr<Node2>(p)); }
+	HeadNode2*GetHead(int col); // col is -1 for header head, aka. hh
 	// node integrity test support
 	std::vector<std::unique_ptr<Node2>> Snap()const;
 	bool Comp(std::vector<std::unique_ptr<Node2>>&x)const;
