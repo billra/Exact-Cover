@@ -51,14 +51,14 @@ public:
 
 class DLX2:public Solver{
 	RaiiNodes2 n; // allocation bucket
-	Node2*rowStart;
+	Node2*rowStart; // used for inserting rows and columns when reading 
 	std::function<void(Event)>Notify;
 	bool show;
-	void Search(HeadNode2*h,int k,std::vector<Node2*>&O);
-	void ShowSolution(int k,std::vector<Node2*>&O)const;
-	HeadNode2*ChooseColumn(HeadNode2*hh)const;
-	void Cover(HeadNode2*c);
-	void Uncover(HeadNode2*c);
+	void Search(HeadNode2*const hh,std::vector<Node2*>&O);
+	void ShowSolution(const std::vector<Node2*>&O)const;
+	HeadNode2*ChooseColumn(HeadNode2*const hh)const;
+	void Cover(HeadNode2*const c);
+	void Uncover(HeadNode2*const c);
 public:
 	DLX2(){} // should not need to define this?
 	void Init(const int pc, const int sc) override;
@@ -69,3 +69,4 @@ public:
 	DLX2(const DLX2&)=delete; // no copy constructor
 };
 
+// make hh a member and don't pass

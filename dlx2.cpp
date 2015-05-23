@@ -51,7 +51,6 @@ bool RaiiNodes2::Comp(vector<std::unique_ptr<Node2>>&x)const
 	if(x.size()!=v.size()){return false;}
 	for(size_t i(0);i<x.size();++i)
 	{
-		//cout<<"types: "<<typeid(*x[i].get()).name()<<" "<<typeid(*v[i].get()).name()<<"\n";
 		if(!x[i].get()->Same(v[i].get()))
 		{
 			return false;
@@ -91,57 +90,74 @@ void DLX2::Solve(const bool showSoln, std::function<void(Event)>CallBack)
 	vector<unique_ptr<Node2>>x(n.Snap()); // capture start state
 	if(!n.Comp(x)){throw(runtime_error("early node structure integrity failure"));}
 	
-	vector<Node2*>O;
+	vector<Node2*>Soln;
 	Notify(Event::Begin);
-	Search(n.GetHead(-1),0,O);
+	Search(n.GetHead(-1),Soln);
 	Notify(Event::End);
 
 	if(!n.Comp(x)){throw(runtime_error("node structure integrity failure"));}
 	cout<<"Node2 structure integrity verified.\n";
 }
 
-void DLX2::Search(HeadNode2*h,int k,vector<Node2*>&O)
+// optimization:	remove recursion from search
+// result:			no improvement
+// conclusion:		in below case, compiler does at least as good a job as I can do by hand
+
+void DLX2::Search(HeadNode2* const hh,vector<Node2*>&Soln)
 {
-	if(h==h->R) // no head nodes
+	// because of goto recursion replacement, it is necessary to have a dummy value which is never used
+	HeadNode2*c = hh;
+
+	vector<Node2*>rStack(n.Size(),nullptr); // fixed preallocated buffer
+	vector<Node2*>::size_type irStack(0); // index of unused position (i.e. rStack.end() )
+
+recurse:
+
+	if(hh==hh->R) // no head nodes
 	{
 		Notify(Event::Soln);
-		if(show){ShowSolution(k,O);}
-		return;
+		if(show){ShowSolution(Soln);}
+		goto pop; // was: return;
 	}
 
-	HeadNode2*c=ChooseColumn(h);
+	c=ChooseColumn(hh);
 	if(!c)
 	{
 		// discover that there is no way to cover a column in this
 		// search branch, return
 		// | If column c is entirely zero, there are no subalgorithms
 		// | and the process terminates unsuccessfully.
-		// cout<<"unable to cover column with remaining rows\n";
-		return;
+		goto pop; // was: return;
 	}
 	
-	//cout<<"Choose column "<<c->N<<" with count "<<c->S<<" level "<<k<<'\n';
 	Cover(c);
 	for(Node2*r=c->D;r!=c;r=r->D) // all the rows in column c
 	{
-		O.emplace_back(r); // implements: set O sub k ← r;
+		Soln.emplace_back(r); // implements: set Soln sub k ← r;
 		for(Node2*j=r->R;j!=r;j=j->R) // all the nodes in row
 		{
 			Cover(j->C);
 		}        
 
-		Search(h,k+1,O);
+		// replace recursion: Search(hh,k+1,Soln);
+		rStack[irStack++] = r;
+		goto recurse;
+	pop:
+		if (!irStack) { return; } // stack is fully unwound
+		r = rStack[--irStack];
+		c = r->C;
 
-		O.pop_back(); // implements: set r ← O sub k and c ← C[r];
+		Soln.pop_back(); // implements: set r ← Soln sub k and c ← C[r];
 		for(Node2*j=r->L;j!=r;j=j->L) // all the nodes in row
 		{
 			Uncover(j->C);
 		}        
 	}
 	Uncover(c);
+	goto pop; // was: default return
 }
 
-void DLX2::ShowSolution(int /*k*/,std::vector<Node2*>&O)const
+void DLX2::ShowSolution(const std::vector<Node2*>&O)const
 {
 	cout<<"[\n";
 	
@@ -159,13 +175,13 @@ void DLX2::ShowSolution(int /*k*/,std::vector<Node2*>&O)const
 }
 
 
-HeadNode2*DLX2::ChooseColumn(HeadNode2*h)const // least covered column
+HeadNode2*DLX2::ChooseColumn(HeadNode2*const hh)const // least covered column
 {
 	// todo: implement as described, without optimization
 	// in: at least one column head node on list
-	HeadNode2*j=static_cast<HeadNode2*>(h->R); // init first as min
+	HeadNode2*j=static_cast<HeadNode2*>(hh->R); // init first as min
 	if(!j->S){return nullptr;} // early return, no way to cover a column
-	for(HeadNode2*p=static_cast<HeadNode2*>(j->R);p!=h;p=static_cast<HeadNode2*>(p->R))
+	for(HeadNode2*p=static_cast<HeadNode2*>(j->R);p!=hh;p=static_cast<HeadNode2*>(p->R))
 	{
 		if(!p->S){return nullptr;} // early return, no way to cover a column
 		if(p->S<j->S){j=p;}
@@ -173,9 +189,8 @@ HeadNode2*DLX2::ChooseColumn(HeadNode2*h)const // least covered column
 	return j;
 }
 
-void DLX2::Cover(HeadNode2*c)
+void DLX2::Cover(HeadNode2*const c)
 {
-	//cout<<"Covering column "<<c->N<<" with count "<<c->S<<'\n';
 	// remove self from head node list
 	c->R->L=c->L;
 	c->L->R=c->R;
@@ -193,9 +208,8 @@ void DLX2::Cover(HeadNode2*c)
 	}
 }
 
-void DLX2::Uncover(HeadNode2*c)
+void DLX2::Uncover(HeadNode2*const c)
 {
-	//cout<<"Uncovering column "<<c->N<<" with count "<<c->S<<'\n';
 	// operations carried out in reverse order of Cover()
 
 	// process column

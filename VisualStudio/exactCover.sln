@@ -5,7 +5,12 @@ VisualStudioVersion = 14.0.22823.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "exactCover", "exactCover.vcxproj", "{8093A234-FC16-4473-867E-947E554AFAD1}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{35A40BD1-B7E0-4FE1-A1DD-3DC4E59F0953}"
+EndProject
 Global
+	GlobalSection(Performance) = preSolution
+		HasPerformanceSessions = true
+	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Analysis|Win32 = Debug Analysis|Win32
 		Debug|Win32 = Debug|Win32
