@@ -1,5 +1,6 @@
 // interface for solve operations
 // Bill Ola Rasmussen
+#pragma once
 
 #include <functional>
 

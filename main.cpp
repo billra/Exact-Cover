@@ -1,6 +1,8 @@
 // read data and run solver
 // Bill Ola Rasmussen
 
+#include "dlx.h"
+#include "dlx2.h"
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -10,7 +12,7 @@
 #include <memory>
 #include <ctime>
 #include <chrono>
-#include "dlx.h"
+#include <memory>
 using namespace std;
 
 // observer pattern
@@ -93,26 +95,32 @@ int main(int argc, char *argv[])
 	// 2nd parameter: name of input file, blank or cin for cin
 	const string inputsrc(argc > 2 ? argv[2] : "cin");
 
-	cout << "Generalized Exact Cover Solver\n"
-		<< "reading input from " << inputsrc << "...\n";
+	// 3rd parameter: solver name, blank for default dlx
+	const string solverName(argc > 3 ? argv[3] : "dlx");
+
+	cout << "Exact Cover Solver\n";
 	try
 	{
-		DLX solver; // todo: choose a solver
+		unique_ptr<Solver> solver;
+		if (solverName == "dlx") { solver.reset(new DLX()); }
+		else if (solverName == "dlx2") { solver.reset(new DLX2()); }
+		else { throw runtime_error("unknown solver: " + solverName); }
 
+		cout << "reading input from " << inputsrc << "...\n";
 		if ("cin" == inputsrc)
 		{
-			readInput(solver, cin);
+			readInput(*solver, cin);
 		}
 		else // input from file
 		{
 			filebuf fb;
 			fb.open(inputsrc, ios::in);
 			istream is(&fb);
-			readInput(solver, is);
+			readInput(*solver, is);
 			fb.close();
 		}
 
-		solver.Solve(!quiet, CallBack);
+		solver->Solve(!quiet, CallBack);
 	}
 	catch (exception const&e)
 	{
