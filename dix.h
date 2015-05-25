@@ -14,7 +14,7 @@ class DIX : public Solver {
 		bool operator==(const TileNode&rhs)const{return rhs.U==U && rhs.D==D && rhs.C==C;} // used in integrity check
 	};
 	std::vector<HeadNode> _head;
-	std::vector<std::vector<TileNode>> _tile;
+	std::vector<std::vector<TileNode>> _tile; // key concept: nodes are grouped in a tile as the relationship between them never changes
 	bool _show;
 	std::function<void(Event)> _notify;
 	void Search(std::vector<TI>& soln);
