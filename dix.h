@@ -17,6 +17,7 @@ class DIX : public Solver {
 	std::vector<std::vector<TileNode>> _tile; // key concept: at solve time, the relationship between tile nodes is static
 	bool _show;
 	std::function<void(Event)> _notify;
+	void ShrinkToFit(); // optional optimization
 	void Search(std::vector<TI>& soln);
 	void ShowSoln(const std::vector<TI>& soln)const;
 public:

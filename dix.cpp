@@ -56,12 +56,21 @@ void DIX::Col(const unsigned int col)
 
 // ---------- solve exact cover problem ----------
 
+void DIX::ShrinkToFit()
+{
+	// call shrink_to_fit() on all vectors
+	_head.shrink_to_fit();
+	for (TI i(0); i < _tile.size(); ++i) { _tile[i].shrink_to_fit(); }
+	_tile.shrink_to_fit();
+}
+
 void DIX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 {
 	_show = showSoln;
 	_notify = CallBack;
 	cout << "DIX::Solve with " << _head.size() << " head nodes, " << _tile.size() << " tiles\n";
 
+	ShrinkToFit(); // vector sizes are now unchanging, so trim extra space
 	const auto check_head(_head); // save for later integrity check
 	const auto check_tile(_tile);
 
