@@ -6,7 +6,7 @@
 class DIX : public Solver {
 	using TI = unsigned int; // index type
 	struct HeadNode { 
-		TI L, R, N;  // column to left, column to right, count of nodes covering column
+		TI L, R, N;  // column to left, column to right, count of nodes covering column (and implicit C starting at -1)
 		bool operator==(const HeadNode&rhs)const{return rhs.L==L && rhs.R==R && rhs.N==N;} // used in integrity check
 	};
 	struct TileNode { 
@@ -19,6 +19,8 @@ class DIX : public Solver {
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
 	void Search(std::vector<TI>& soln);
+	void Cover(const TI& ihv);
+	void Uncover(const TI& ihv);
 	TI ChooseColumn()const;
 	void ShowSoln(const std::vector<TI>& soln)const;
 public:

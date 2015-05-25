@@ -98,19 +98,18 @@ void DIX::Search(vector<TI>& soln)
 
 	const TI ihv(ChooseColumn()); // get _head vector index of minimally covered column
 	if (!ihv) { return; } // a column could not be covered with remaining tiles, abort this search branch
-	const TI c(ihv - 1); // translate _head vector index to node column id
-
-	////cout<<"Choose column "<<c->N<<" with count "<<c->S<<" level "<<k<<'\n';
-	//Cover(c);
+	// need? const TI c(ihv - 1); // translate _head vector index to node column id
+	// invariant: ihv > 0
+	Cover(ihv);
 	//for (Node*r = c->D; r != c; r = r->D) // all the rows in column c
 	//{
-	//	O.emplace_back(r); // implements: set O sub k ? r;
+	//	O.emplace_back(r);
 	//	for (Node*j = r->R; j != r; j = j->R) // all the nodes in row
 	//	{
 	//		Cover(j->C);
 	//	}
 
-	//	Search(h, k + 1, O);
+	Search(soln);
 
 	//	O.pop_back(); // implements: set r ? O sub k and c ? C[r];
 	//	for (Node*j = r->L; j != r; j = j->L) // all the nodes in row
@@ -118,7 +117,47 @@ void DIX::Search(vector<TI>& soln)
 	//		Uncover(j->C);
 	//	}
 	//}
-	//Uncover(c);
+	Uncover(ihv);
+}
+
+void DIX::Cover(const TI & ihv)
+{
+	// remove self from head node list
+	_head[_head[ihv].R].L = _head[ihv].L;
+	_head[_head[ihv].L].R = _head[ihv].R;
+
+	//// process column
+	//for (Node*i = c->D; i != c; i = i->D) // all rows having nodes in this column
+	//{
+	//	for (Node*j = i->R; j != i; j = j->R) // all _other_ nodes in this row
+	//	{
+	//		// remove node from column
+	//		j->D->U = j->U;
+	//		j->U->D = j->D;
+	//		// inform column head that it has one less node
+	//		--(j->C->S);
+	//	}
+	//}
+}
+
+void DIX::Uncover(const TI & ihv)
+{
+	// process column
+	//for (Node*i = c->U; i != c; i = i->U) // all rows having nodes in this column, reverse order
+	//{
+	//	for (Node*j = i->L; j != i; j = j->L) // all _other_ nodes in this row, reverse order
+	//	{
+	//		// inform column head that its node came back
+	//		++(j->C->S);
+	//		// insert node back into column
+	//		j->D->U = j;
+	//		j->U->D = j;
+	//	}
+	//}
+
+	// reinsert self into head node list
+	_head[_head[ihv].R].L = ihv;
+	_head[_head[ihv].L].R = ihv;
 }
 
 DIX::TI DIX::ChooseColumn() const
