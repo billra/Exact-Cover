@@ -15,11 +15,13 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\dix.cpp" />
     <ClCompile Include="..\dlx.cpp" />
     <ClCompile Include="..\dlx2.cpp" />
     <ClCompile Include="..\main.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="..\dix.h" />
     <ClInclude Include="..\dlx.h" />
     <ClInclude Include="..\dlx2.h" />
     <ClInclude Include="..\Solver.h" />
