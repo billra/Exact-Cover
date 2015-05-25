@@ -19,6 +19,7 @@ class DIX : public Solver {
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
 	void Search(std::vector<TI>& soln);
+	TI ChooseColumn()const;
 	void ShowSoln(const std::vector<TI>& soln)const;
 public:
 	DIX(){}

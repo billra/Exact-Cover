@@ -4,17 +4,20 @@
 #include "dix.h"
 #include <stdexcept>
 #include <iostream>
+#include <limits>
 using namespace std;
 
 // ---------- build data structure from input ----------
 
 void DIX::Init(const unsigned int pc, const unsigned int sc)
 {
+	// primary constraint: cover this exactly once
+	// secondary constraint: cover this at most once
 	if (0 == pc+sc) { throw(runtime_error("zero constraint count")); }
 
 	// create head row vector
 	_head.resize(1+pc+sc); // head node of head nodes, primary constraints, secondary constraints
-	_head[0] = { pc, 1, 0 }; // head node of head nodes circular link: beginning to end
+	_head[0] = { pc, 1, numeric_limits<TI>::max() }; // head node of head nodes circular link: beginning to end
 	for (TI i(1); i < 1+pc; ++i) {
 		_head[i] = { i-1, i+1, 0 }; // primary constraints: link to both neighbors
 	}
@@ -86,9 +89,47 @@ void DIX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 
 void DIX::Search(vector<TI>& soln)
 {
-	// ... magic happens here ...
+	if (!_head[0].R) // head node of head nodes points to itself, indicates all constraints are met
+	{
+		_notify(Event::Soln);
+		if (_show) { ShowSoln(soln); }
+		return;
+	}
 
-	ShowSoln(soln); // dummy
+	const TI ihv(ChooseColumn()); // get _head vector index of minimally covered column
+	if (!ihv) { return; } // a column could not be covered with remaining tiles, abort this search branch
+	const TI c(ihv - 1); // translate _head vector index to node column id
+
+	////cout<<"Choose column "<<c->N<<" with count "<<c->S<<" level "<<k<<'\n';
+	//Cover(c);
+	//for (Node*r = c->D; r != c; r = r->D) // all the rows in column c
+	//{
+	//	O.emplace_back(r); // implements: set O sub k ? r;
+	//	for (Node*j = r->R; j != r; j = j->R) // all the nodes in row
+	//	{
+	//		Cover(j->C);
+	//	}
+
+	//	Search(h, k + 1, O);
+
+	//	O.pop_back(); // implements: set r ? O sub k and c ? C[r];
+	//	for (Node*j = r->L; j != r; j = j->L) // all the nodes in row
+	//	{
+	//		Uncover(j->C);
+	//	}
+	//}
+	//Uncover(c);
+}
+
+DIX::TI DIX::ChooseColumn() const
+{
+	// minimize search space by selecting most constrained column
+	TI iMin(0); // head node: N == numeric_limits<TI>::max()
+	for (TI ih(_head[0].R); ih; ih = _head[ih].R) {
+		if (!_head[ih].N) { return 0; } // early return, no way to cover a column
+		if (_head[ih].N < _head[iMin].N) { iMin = ih; }
+	}
+	return iMin;
 }
 
 void DIX::ShowSoln(const vector<TI>& soln)const
