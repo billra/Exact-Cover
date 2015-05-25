@@ -65,11 +65,33 @@ void DIX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	const auto check_head(_head); // save for later integrity check
 	const auto check_tile(_tile);
 
+	vector<TI> soln;
 	_notify(Event::Begin);
-	// ... magic happens here ...
+	Search(soln);
 	_notify(Event::End);
 
 	if (check_head != _head) { throw(runtime_error("head node structure integrity failure")); }
 	if (check_tile != _tile) { throw(runtime_error("tile node structure integrity failure")); }
 	cout << "Node structure integrity verified.\n";
+}
+
+void DIX::Search(vector<TI>& soln)
+{
+	// ... magic happens here ...
+
+	ShowSoln(soln); // dummy
+}
+
+void DIX::ShowSoln(const vector<TI>& soln)const
+{
+	cout << "[\n";
+	for (const auto& iRow : soln) // for each tile in the solution
+	{
+		for (const auto& iCol : _tile[iRow]) // print out all the nodes in the tile
+		{
+			cout << iCol.C << " ";
+		}
+		cout << "\n";
+	}
+	cout << "]\n";
 }

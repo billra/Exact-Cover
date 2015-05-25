@@ -17,6 +17,8 @@ class DIX : public Solver {
 	std::vector<std::vector<TileNode>> _tile;
 	bool _show;
 	std::function<void(Event)> _notify;
+	void Search(std::vector<TI>& soln);
+	void ShowSoln(const std::vector<TI>& soln)const;
 public:
 	DIX(){}
 	void Init(const unsigned int pc, const unsigned int sc) override;
