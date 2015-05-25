@@ -3,9 +3,8 @@
 #include "Solver.h"
 #include <vector>
 
-using TI = unsigned int; // index type
-
 class DIX : public Solver {
+	using TI = unsigned int; // index type
 	struct HeadNode { TI L, R, N; }; // column to left, column to right, count of nodes covering column
 	struct TileNode { TI U, D, C; }; // row up, row down, column covered by the node
 	std::vector<HeadNode> _head;
