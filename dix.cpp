@@ -3,6 +3,7 @@
 
 #include "dix.h"
 #include <stdexcept>
+#include <iostream>
 using namespace std;
 
 // ---------- build data structure from input ----------
@@ -59,10 +60,16 @@ void DIX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 {
 	_show = showSoln;
 	_notify = CallBack;
+	cout << "DIX::Solve with " << _head.size() << " head nodes, " << _tile.size() << " tiles\n";
+
+	const auto check_head(_head); // save for later integrity check
+	const auto check_tile(_tile);
 
 	_notify(Event::Begin);
-
 	// ... magic happens here ...
-
 	_notify(Event::End);
+
+	if (check_head != _head) { throw(runtime_error("head node structure integrity failure")); }
+	if (check_tile != _tile) { throw(runtime_error("tile node structure integrity failure")); }
+	cout << "Node structure integrity verified.\n";
 }

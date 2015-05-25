@@ -5,8 +5,14 @@
 
 class DIX : public Solver {
 	using TI = unsigned int; // index type
-	struct HeadNode { TI L, R, N; }; // column to left, column to right, count of nodes covering column
-	struct TileNode { TI U, D, C; }; // row up, row down, column covered by the node
+	struct HeadNode { 
+		TI L, R, N;  // column to left, column to right, count of nodes covering column
+		bool operator==(const HeadNode&rhs)const{return rhs.L==L && rhs.R==R && rhs.N==N;} // used in integrity check
+	};
+	struct TileNode { 
+		TI U, D, C; // row up, row down, column covered by the node
+		bool operator==(const TileNode&rhs)const{return rhs.U==U && rhs.D==D && rhs.C==C;} // used in integrity check
+	};
 	std::vector<HeadNode> _head;
 	std::vector<std::vector<TileNode>> _tile;
 	bool _show;
