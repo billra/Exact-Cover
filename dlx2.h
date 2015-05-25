@@ -60,9 +60,9 @@ class DLX2:public Solver{
 	void Uncover(HeadNode2*const c);
 public:
 	DLX2(){} // should not need to define this?
-	void Init(const int pc, const int sc) override;
-	void Row(const int col) override;
-	void Col(const int col) override;
+	void Init(const unsigned int pc, const unsigned int sc) override;
+	void Row(const unsigned int col) override;
+	void Col(const unsigned int col) override;
 	void Solve(const bool showSoln, std::function<void(Event)>CallBack) override;
 	DLX2&operator=(const DLX2&)=delete; // no assignment
 	DLX2(const DLX2&)=delete; // no copy constructor

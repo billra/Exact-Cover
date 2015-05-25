@@ -83,23 +83,23 @@ bool RaiiNodes::Comp(vector<std::unique_ptr<Node>>&x)const
 //
 // see insertion of secondary constraint head nodes below
 
-void DLX::Init(const int pc, const int sc)
+void DLX::Init(const unsigned int pc, const unsigned int sc)
 {
 	n.V(new HeadNode(-1)); // head node of head nodes
-	for(int i(0);i<pc;++i) // primary constraint head nodes
+	for(unsigned int i(0);i<pc;++i) // primary constraint head nodes
 	{
 		n.V(n.GetHead(-1)->LinkL(new HeadNode(i))); // link on raw pointers
 	}
-	for(int i(0);i<sc;++i) // secondary constraint head nodes
+	for(unsigned int i(0);i<sc;++i) // secondary constraint head nodes
 	{
 		n.V(new HeadNode(i+pc)); // no link to peers
 	}
 }
-void DLX::Row(const int col)
+void DLX::Row(const unsigned int col)
 {
 	n.V(rowStart=n.GetHead(col)->LinkU(new Node()));
 }
-void DLX::Col(const int col)
+void DLX::Col(const unsigned int col)
 {    
 	n.V(rowStart->LinkL(n.GetHead(col)->LinkU(new Node())));
 }

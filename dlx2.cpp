@@ -59,24 +59,24 @@ HeadNode2*RaiiNodes2::GetHead(int col) // col is -1 for header head
 }
 
 // contiguous head array to increase locality of reference
-void DLX2::Init(const int pc, const int sc)
+void DLX2::Init(const unsigned int pc, const unsigned int sc)
 {
 	n.vh.resize(1 + pc + sc); // head node of head nodes, primary constraints, secondary constraints
 	for (vector<HeadNode2>::size_type i(0); i < n.vh.size(); ++i) // all nodes get a name, hh == -1
 	{
 		n.vh[i].N = i - 1;
 	}
-	for (int i(1); i < pc; ++i) // circular link primary constraint nodes
+	for (unsigned int i(1); i < pc; ++i) // circular link primary constraint nodes
 	{
 		n.GetHead(-1)->LinkL(&n.vh[i]);
 	}
 }
 // 2. todo: make contiguous nodes in tiles
-void DLX2::Row(const int col)
+void DLX2::Row(const unsigned int col)
 {
 	n.V(rowStart=n.GetHead(col)->LinkU(new Node2()));
 }
-void DLX2::Col(const int col)
+void DLX2::Col(const unsigned int col)
 {    
 	n.V(rowStart->LinkL(n.GetHead(col)->LinkU(new Node2())));
 }
