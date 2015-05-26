@@ -31,7 +31,7 @@ void DIX::Init(const unsigned int pc, const unsigned int sc)
 	// create complete first row on tile array to serve as up/down pointers for head nodes
 	_tile.emplace_back(vector<TileNode>(pc+sc)); // _tile[0] is one smaller than _head because no head node of head nodes
 	for (TI i(0); i < pc+sc; ++i) {
-		_tile.back()[i] = { 0, 0, i }; // all constraints: link to self
+		_tile.back()[i] = { 0, 0, 1+i }; // link to self, translate 0 based column input to 1 based internal representation
 	}
 }
 
@@ -42,18 +42,18 @@ void DIX::Row(const unsigned int col)
 	Col(col);
 }
 
-void DIX::Col(const unsigned int col)
+void DIX::Col(const unsigned int col) // input col starts at 0
 {
 	if (1+col>=_head.size()) { throw(runtime_error("column index out of range")); }
 	_head[1+col].N += 1; // increase cover count
 	auto& iPrevTile(_tile[0][col].U); // previous tile with node in column col
 	auto& prevTile(_tile[iPrevTile]); // tile with node before new tile
 	TI iCol(0); // index of node in column col in prevTile
-	for (; iCol < prevTile.size() && col!=prevTile[iCol].C; ++iCol) {}
+	for (; iCol < prevTile.size() && 1+col!=prevTile[iCol].C; ++iCol) {}
 	if (prevTile.size()==iCol) { throw(runtime_error("column index not found in previous tile")); }
 	const auto iRow(_tile.size()-1); // index of current insert row
 	prevTile[iCol].D = iRow; // point previous last to new last
-	_tile.back().push_back({ iPrevTile,0,col }); // link node to head row in _tile
+	_tile.back().push_back({ iPrevTile,0,1+col }); // link node to head row in _tile
 	iPrevTile = iRow; // update head to index new last
 }
 
@@ -96,11 +96,11 @@ void DIX::Search(vector<TI>& soln)
 		return;
 	}
 
-	const TI ihv(ChooseColumn()); // get _head vector index of minimally covered column
-	if (!ihv) { return; } // a column could not be covered with remaining tiles, abort this search branch
-	// need? const TI c(ihv - 1); // translate _head vector index to node column id
-	// invariant: ihv > 0
-	Cover(ihv);
+	const TI c(ChooseColumn()); // get _head vector index of minimally covered column
+	if (!c) { return; } // a column could not be covered with remaining tiles, abort this search branch
+	// invariant: c > 0
+
+	Cover(c);
 	//for (Node*r = c->D; r != c; r = r->D) // all the rows in column c
 	//{
 	//	O.emplace_back(r);
@@ -117,14 +117,14 @@ void DIX::Search(vector<TI>& soln)
 	//		Uncover(j->C);
 	//	}
 	//}
-	Uncover(ihv);
+	Uncover(c);
 }
 
-void DIX::Cover(const TI & ihv)
+void DIX::Cover(const TI & c)
 {
 	// remove self from head node list
-	_head[_head[ihv].R].L = _head[ihv].L;
-	_head[_head[ihv].L].R = _head[ihv].R;
+	_head[_head[c].R].L = _head[c].L;
+	_head[_head[c].L].R = _head[c].R;
 
 	//// process column
 	//for (Node*i = c->D; i != c; i = i->D) // all rows having nodes in this column
@@ -140,7 +140,7 @@ void DIX::Cover(const TI & ihv)
 	//}
 }
 
-void DIX::Uncover(const TI & ihv)
+void DIX::Uncover(const TI & c)
 {
 	// process column
 	//for (Node*i = c->U; i != c; i = i->U) // all rows having nodes in this column, reverse order
@@ -156,8 +156,8 @@ void DIX::Uncover(const TI & ihv)
 	//}
 
 	// reinsert self into head node list
-	_head[_head[ihv].R].L = ihv;
-	_head[_head[ihv].L].R = ihv;
+	_head[_head[c].R].L = c;
+	_head[_head[c].L].R = c;
 }
 
 DIX::TI DIX::ChooseColumn() const
@@ -178,7 +178,7 @@ void DIX::ShowSoln(const vector<TI>& soln)const
 	{
 		for (const auto& iCol : _tile[iRow]) // print out all the nodes in the tile
 		{
-			cout << iCol.C << " ";
+			cout << iCol.C-1 << " "; // internal column is 1 based, external representation is 0 based
 		}
 		cout << "\n";
 	}
