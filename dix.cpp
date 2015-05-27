@@ -28,33 +28,38 @@ void DIX::Init(const unsigned int pc, const unsigned int sc)
 		_head[i] = { i, i, 0 }; // secondary constraints: link to self
 	}
 
-	// create complete first row on tile array to serve as up/down pointers for head nodes
-	_tile.emplace_back(vector<TileNode>(pc+sc)); // _tile[0] is one smaller than _head because no head node of head nodes
+	// create complete tile array to serve as up/down pointers for head nodes
+	// one smaller than _head because no head node of head nodes
 	for (TI i(0); i < pc+sc; ++i) {
-		_tile.back()[i] = { 0, 0, 1+i }; // link to self, translate 0 based column input to 1 based internal representation
+		_tile.push_back({ i, i, 1+i }); // link to self, translate 0 based column input to 1 based internal representation
 	}
 }
 
 void DIX::Row(const unsigned int col)
 {
-	if (1+col>=_head.size()) { throw(runtime_error("column index out of range")); }
-	_tile.emplace_back(vector<TileNode>()); // empty vector
 	Col(col);
 }
 
-void DIX::Col(const unsigned int col) // input col starts at 0
+void DIX::Col(const unsigned int external_col_id) // external col starts at 0
 {
-	if (1+col>=_head.size()) { throw(runtime_error("column index out of range")); }
-	_head[1+col].N += 1; // increase cover count
-	auto& iPrevTile(_tile[0][col].U); // previous tile with node in column col
-	auto& prevTile(_tile[iPrevTile]); // tile with node before new tile
-	TI iCol(0); // index of node in column col in prevTile
-	for (; iCol < prevTile.size() && 1+col!=prevTile[iCol].C; ++iCol) {}
-	if (prevTile.size()==iCol) { throw(runtime_error("column index not found in previous tile")); }
-	const auto iRow(_tile.size()-1); // index of current insert row
-	prevTile[iCol].D = iRow; // point previous last to new last
-	_tile.back().push_back({ iPrevTile,0,1+col }); // link node to head row in _tile
-	iPrevTile = iRow; // update head to index new last
+	// adjust index
+	const unsigned int c(1+external_col_id); // translate 0 based column input to 1 based internal representation
+
+	// increment node count head array
+	if (c>=_head.size()) { throw(runtime_error("column index out of range")); }
+	_head[c].N++; // increase cover count
+
+	// find previous node in same column
+	TI iU(_tile.size()-1);
+	for(;iU;--iU){ // reverse node/tile search
+		if(c==_tile[iU].C){ break; }
+	}
+	if (c!=_tile[iU].C) { throw(runtime_error("previous node for column not found")); }
+
+	// insert a new node
+	_tile.push_back({ iU,_tile[iU].D,c });
+	_tile[_tile[iU].D].U = _tile.size()-1; // point next to this
+	_tile[iU].D = _tile.size()-1; // point previous to this
 }
 
 // ---------- solve exact cover problem ----------
@@ -63,7 +68,6 @@ void DIX::ShrinkToFit()
 {
 	// call shrink_to_fit() on all vectors
 	_head.shrink_to_fit();
-	for (TI i(0); i < _tile.size(); ++i) { _tile[i].shrink_to_fit(); }
 	_tile.shrink_to_fit();
 }
 
@@ -139,7 +143,7 @@ void DIX::Cover(const TI & c) // remove all tiles covering node, remove node
 //				i = node.D; // use column c for link to next tile
 //			}
 //			else { // remove node from column
-//				_tile[node.D][???].U = node.U;  // problem: need to search destination array!  TODO: make _tile single dimensional array
+//				_tile[node.D][???].U = node.U;  // problem: need to search destination array!
 //			}
 	//		// remove node from column
 	//		j->D->U = j->U;
@@ -186,11 +190,12 @@ void DIX::ShowSoln(const vector<TI>& soln)const
 	cout << "[\n";
 	for (const auto& iRow : soln) // for each tile in the solution
 	{
-		for (const auto& iCol : _tile[iRow]) // print out all the nodes in the tile
-		{
-			cout << iCol.C-1 << " "; // internal column is 1 based, external representation is 0 based
-		}
-		cout << "\n";
+		cout << iRow << endl; // todo: rework
+		//for (const auto& iCol : _tile[iRow]) // print out all the nodes in the tile
+		//{
+		//	cout << iCol.C-1 << " "; // internal column is 1 based, external representation is 0 based
+		//}
+		//cout << "\n";
 	}
 	cout << "]\n";
 }
