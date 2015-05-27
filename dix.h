@@ -13,6 +13,7 @@ class DIX : public Solver {
 		TI U, D, C; // row up, row down, column covered by the node: index starting at 1 to match HeadNode vector
 		bool operator==(const TileNode&rhs)const{return rhs.U==U && rhs.D==D && rhs.C==C;} // used in integrity check
 	};
+	const static TileNode SEP; // tile separator
 	std::vector<HeadNode> _head;
 	std::vector<TileNode> _tile; // key concept: at solve time, the relationship between tile nodes is static
 	bool _show;

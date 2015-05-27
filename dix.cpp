@@ -9,6 +9,8 @@ using namespace std;
 
 // ---------- build data structure from input ----------
 
+const DIX::TileNode DIX::SEP{ numeric_limits<DIX::TI>::max(),numeric_limits<DIX::TI>::max(),0 }; // tile separator
+
 void DIX::Init(const unsigned int pc, const unsigned int sc)
 {
 	// primary constraint: cover this exactly once
@@ -33,10 +35,12 @@ void DIX::Init(const unsigned int pc, const unsigned int sc)
 	for (TI i(0); i < pc+sc; ++i) {
 		_tile.push_back({ i, i, 1+i }); // link to self, translate 0 based column input to 1 based internal representation
 	}
+	_tile.push_back(SEP);
 }
 
 void DIX::Row(const unsigned int col)
 {
+	_tile.push_back(SEP);
 	Col(col);
 }
 
@@ -56,10 +60,12 @@ void DIX::Col(const unsigned int external_col_id) // external col starts at 0
 	}
 	if (c!=_tile[iU].C) { throw(runtime_error("previous node for column not found")); }
 
-	// insert a new node
-	_tile.push_back({ iU,_tile[iU].D,c });
+	// insert a new node: overwrite the separator, then push a new one
+	if (!(SEP==_tile.back())) { throw(runtime_error("tile separator not found")); }
+	_tile.back()={ iU,_tile[iU].D,c };
 	_tile[_tile[iU].D].U = _tile.size()-1; // point next to this
 	_tile[iU].D = _tile.size()-1; // point previous to this
+	_tile.push_back(SEP);
 }
 
 // ---------- solve exact cover problem ----------
@@ -73,6 +79,8 @@ void DIX::ShrinkToFit()
 
 void DIX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 {
+	if (!(SEP==_tile.back())) { throw(runtime_error("tile separator not found")); }
+
 	_show = showSoln;
 	_notify = CallBack;
 	cout << "DIX::Solve with " << _head.size() << " head nodes, " << _tile.size() << " tiles\n";
