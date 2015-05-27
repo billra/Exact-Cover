@@ -100,7 +100,8 @@ void DIX::Search(vector<TI>& soln)
 	if (!c) { return; } // a column could not be covered with remaining tiles, abort this search branch
 	// invariant: c > 0
 
-	Cover(c);
+	Cover(c); // take all tiles covering this node out of play
+
 	//for (Node*r = c->D; r != c; r = r->D) // all the rows in column c
 	//{
 	//	O.emplace_back(r);
@@ -120,24 +121,33 @@ void DIX::Search(vector<TI>& soln)
 	Uncover(c);
 }
 
-void DIX::Cover(const TI & c)
+void DIX::Cover(const TI & c) // remove all tiles covering node, remove node
 {
 	// remove self from head node list
 	_head[_head[c].R].L = _head[c].L;
 	_head[_head[c].L].R = _head[c].R;
 
-	//// process column
-	//for (Node*i = c->D; i != c; i = i->D) // all rows having nodes in this column
+	// remove tiles
+//	for (TI i(_tile[0][c].D); i;) {
+	//for (Node*i = c->D; i != c; i = i->D) // all tiles having nodes in this column
 	//{
-	//	for (Node*j = i->R; j != i; j = j->R) // all _other_ nodes in this row
+//		for (TI j(0); j < _tile[i].size(); ++j) { // remove all nodes in tile outside column c
+	//	for (Node*j = i->R; j != i; j = j->R) 
 	//	{
+//			auto& node(_tile[i][j]);
+//			if (j == c) {
+//				i = node.D; // use column c for link to next tile
+//			}
+//			else { // remove node from column
+//				_tile[node.D][???].U = node.U;  // problem: need to search destination array!  TODO: make _tile single dimensional array
+//			}
 	//		// remove node from column
 	//		j->D->U = j->U;
 	//		j->U->D = j->D;
 	//		// inform column head that it has one less node
 	//		--(j->C->S);
-	//	}
-	//}
+//		}
+//	}
 }
 
 void DIX::Uncover(const TI & c)
