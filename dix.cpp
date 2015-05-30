@@ -187,14 +187,13 @@ DIX::TI DIX::ChooseColumn() const
 void DIX::ShowSoln(const vector<TI>& soln)const
 {
 	cout << "[\n";
-	for (const auto& iRow : soln) // for each tile in the solution
-	{
-		cout << iRow << endl; // todo: rework
-		//for (const auto& iCol : _tile[iRow]) // print out all the nodes in the tile
-		//{
-		//	cout << iCol.C-1 << " "; // internal column is 1 based, external representation is 0 based
-		//}
-		//cout << "\n";
+	for (const auto& i : soln) { // a single node in a tile
+		TI iFirst(i);
+		for (; _tile[iFirst-1].C; --iFirst) {} // search left for first node in tile
+		for (TI j(iFirst); _tile[j].C; ++j) {
+			cout << _tile[j].C-1 << " "; // internal column is 1 based, external representation is 0 based
+		}
+		cout << "\n";
 	}
 	cout << "]\n";
 }
