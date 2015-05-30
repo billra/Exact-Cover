@@ -133,25 +133,21 @@ void DIX::Search(vector<TI>& soln)
 	Uncover(c);
 }
 
-void DIX::CoverNode(const TI & )
+void DIX::CoverNode(const TI& c)
 {
-	//		// remove node from column
-	//		j->D->U = j->U;
-	//		j->U->D = j->D;
-	//		// inform column head that it has one less node
-	//		--(j->C->S);
+	--_head[_tile[c].C].N; // inform column head that it has one less node
+	_tile[  _tile[c].D].U = _tile[c].U; // remove node from column
+	_tile[  _tile[c].U].D = _tile[c].D;
 }
 
-void DIX::UncoverNode(const TI & )
+void DIX::UncoverNode(const TI& c)
 {
-	//		// inform column head that its node came back
-	//		++(j->C->S);
-	//		// insert node back into column
-	//		j->D->U = j;
-	//		j->U->D = j;
+	++_head[_tile[c].C].N; // inform column head that node came back
+	_tile[  _tile[c].D].U = c; // insert node back into column
+	_tile[  _tile[c].U].D = c;
 }
 
-void DIX::Cover(const TI & c) // remove all tiles covering node, remove node
+void DIX::Cover(const TI& c) // remove all tiles covering node, remove node
 {
 	// remove self from head node list
 	_head[_head[c].R].L = _head[c].L;
@@ -164,7 +160,7 @@ void DIX::Cover(const TI & c) // remove all tiles covering node, remove node
 	}
 }
 
-void DIX::Uncover(const TI & c)
+void DIX::Uncover(const TI& c)
 {
 	// reinsert self into head node list
 	_head[_head[c].R].L = c;
@@ -172,8 +168,8 @@ void DIX::Uncover(const TI & c)
 
 	// uncover tiles
 	for (TI i(_tile[c].U); i; i = _tile[i].U) { // all tiles having nodes in this column, reverse order
-		for (TI j(i - 1); _tile[j].C; --j) { CoverNode(j); } // all nodes to left of column
-		for (TI j(i + 1); _tile[j].C; ++j) { CoverNode(j); } // all nodes to right of column
+		for (TI j(i - 1); _tile[j].C; --j) { UncoverNode(j); } // all nodes to left of column
+		for (TI j(i + 1); _tile[j].C; ++j) { UncoverNode(j); } // all nodes to right of column
 	}
 }
 
