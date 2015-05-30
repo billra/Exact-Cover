@@ -182,7 +182,7 @@ void DLX2::Uncover(HeadNode2*const c)
 	// process column
 	for(Node2*i=c->U;i!=c;i=i->U) // all rows having nodes in this column, reverse order
 	{
-		for (Node2*j = i->R; j != i; j = j->R) // all _other_ nodes in this row (reverse order actuall not necessary!)
+		for (Node2*j = i->R; j != i; j = j->R) // all _other_ nodes in this row (reverse order actually not necessary!)
 		{
 			// inform column head that its node came back
 			++(j->C->S);

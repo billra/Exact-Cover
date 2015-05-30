@@ -20,6 +20,8 @@ class DIX : public Solver {
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
 	void Search(std::vector<TI>& soln);
+	void CoverNode(const TI& c);
+	void UncoverNode(const TI& c);
 	void Cover(const TI& c);
 	void Uncover(const TI& c);
 	TI ChooseColumn()const;
