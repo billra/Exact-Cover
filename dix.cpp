@@ -116,14 +116,29 @@ void DIX::Search(vector<TI>& soln)
 
 	for (TI i(_tile[c].D); i!=c; i = _tile[i].D) { // all tiles having nodes in this column (same as those just processed in above cover call)
 		soln.emplace_back(i);
-		vector<TI> it;
-		for (TI j(i - 1); _tile[j].C; --j) { Cover(_tile[j].C); it.emplace_back(j); } // all nodes to left of column
-		for (TI j(i + 1); _tile[j].C; ++j) { Cover(_tile[j].C); it.emplace_back(j); } // all nodes to right of column
+
+		TI jL(i);
+		for (TI j(i - 1); _tile[j].C; --j) { // all nodes to left of column
+			Cover(_tile[j].C); 
+			jL = j;
+		}
+
+		TI jR(i);
+		for (TI j(i + 1); _tile[j].C; ++j) { // all nodes to right of column
+			Cover(_tile[j].C); 
+			jR = j;
+		}
+
 		Search(soln);
 		soln.pop_back();
-		//for (TI j(i - 1); _tile[j].C; --j) { Uncover(_tile[j].C); } // all nodes to left of column
-		//for (TI j(i + 1); _tile[j].C; ++j) { Uncover(_tile[j].C); } // all nodes to right of column
-		while (it.size()) { Uncover(_tile[it.back()].C); it.pop_back(); } // reverse order
+
+		for (TI j(jR); j!=i; --j) { // all nodes to right of column, reverse order
+			Uncover(_tile[j].C); 
+		}
+
+		for (TI j(jL); j!=i; ++j) { // all nodes to left of column, reverse order
+			Uncover(_tile[j].C); 
+		}
 	}
 	Uncover(c);
 }
@@ -150,8 +165,12 @@ void DIX::Cover(const TI& c) // remove all tiles covering node, remove node
 
 	// cover tiles
 	for (TI i(_tile[c].D); i!=c; i = _tile[i].D) { // all tiles having nodes in this column
-		for (TI j(i - 1); _tile[j].C; --j) { CoverNode(j); } // all nodes to left of column
-		for (TI j(i + 1); _tile[j].C; ++j) { CoverNode(j); } // all nodes to right of column
+		for (TI j(i - 1); _tile[j].C; --j) { // all nodes to left of column
+			CoverNode(j); 
+		}
+		for (TI j(i + 1); _tile[j].C; ++j) { // all nodes to right of column
+			CoverNode(j); 
+		}
 	}
 }
 
@@ -163,8 +182,12 @@ void DIX::Uncover(const TI& c)
 
 	// uncover tiles
 	for (TI i(_tile[c].U); i!=c; i = _tile[i].U) { // all tiles having nodes in this column, reverse order
-		for (TI j(i - 1); _tile[j].C; --j) { UncoverNode(j); } // all nodes to left of column
-		for (TI j(i + 1); _tile[j].C; ++j) { UncoverNode(j); } // all nodes to right of column
+		for (TI j(i - 1); _tile[j].C; --j) { // all nodes to left of column
+			UncoverNode(j); 
+		}
+		for (TI j(i + 1); _tile[j].C; ++j) { // all nodes to right of column
+			UncoverNode(j); 
+		}
 	}
 }
 
