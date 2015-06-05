@@ -3,6 +3,7 @@
 // Bill Ola Rasmussen
 
 #include "Solver.h"
+#include <vector>
 
 class ACX : public Solver {
 	// C++11 <cstdint> types:
@@ -10,6 +11,10 @@ class ACX : public Solver {
 	//	int16_t		0 to        65,535	2 bytes
 	//	int32_t		0 to 4,294,967,295	4 bytes, same as Microsoft unsigned int
 	using TI = unsigned int; // index type
+	unsigned int _pc; // primary constraints, size of _board or less
+	std::vector<TI> _board;
+	using Tile = std::vector<TI>; // single tile
+	std::vector<Tile> _tile; // all available tiles
 	bool _show;
 	std::function<void(Event)> _notify;
 public:
