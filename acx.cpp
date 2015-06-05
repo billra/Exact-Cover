@@ -48,29 +48,45 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	_notify = CallBack;
 	cout << "ACX::Solve, board size: " << _board.size() << ", tiles: " << _tile.size() << "\n";
 	ShrinkToFit(); // vector sizes are now unchanging, so trim extra space
-	Search();
+	Search(_board, _tile);
 }
 
-void ACX::Search()
+void ACX::Search(const vector<TI>& board, const vector<Tile>& tile)
 {
-	const auto col(ChooseColumn());
+	const auto col(ChooseColumn(board));
 	if (!_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
 
 	const auto choices(Covers(col)); // tiles which cover col
-
+	for (const auto& iTile : choices) {
+		const auto newBoard(TileBoard(board, tile[iTile]));
+		const auto newTile(RemoveConflicts(tile, iTile));
+		// recurse...
+	}
 }
 
-ACX::TI ACX::ChooseColumn() const
+std::vector<ACX::TI> ACX::TileBoard(const vector<TI>& board, const vector<TI>& tile) const
+{
+	// todo
+	return vector<TI>();
+}
+
+std::vector<ACX::Tile> ACX::RemoveConflicts(const vector<Tile>& tile, const TI iTile) const
+{
+	// todo
+	return vector<ACX::Tile>();
+}
+
+ACX::TI ACX::ChooseColumn(const vector<TI>& board) const
 {
 	// minimize search space by selecting most constrained column
 	TI iMin(0); // assume first square on board
-	for (TI i(1); i < _board.size(); ++i) {
-		if (_board[iMin] > _board[i]) { iMin = i; }
+	for (TI i(1); i < board.size(); ++i) {
+		if (board[iMin] > board[i]) { iMin = i; }
 	}
 	return iMin;
 }
 
-vector<ACX::TI> ACX::Covers(const TI col)
+vector<ACX::TI> ACX::Covers(const TI col) const
 {
 	// linear search for tiles covering col (as fast or faster than following pointers? we will see...)
 	vector<TI> vt;
