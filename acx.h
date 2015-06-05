@@ -21,6 +21,7 @@ class ACX : public Solver {
 	void ShrinkToFit(); // optional optimization
 	void Search();
 	TI ChooseColumn() const;
+	std::vector<TI> Covers(const TI col);
 public:
 	ACX() {}
 	void Init(const unsigned int pc, const unsigned int sc) override;
