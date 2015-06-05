@@ -4,6 +4,7 @@
 #include "dlx.h"
 #include "dlx2.h"
 #include "dix.h"
+#include "acx.h"
 #include <iostream>
 #include <iomanip>
 #include <string>
@@ -106,6 +107,7 @@ int main(int argc, char *argv[])
 		if (solverName == "dlx") { solver.reset(new DLX()); }
 		else if (solverName == "dlx2") { solver.reset(new DLX2()); }
 		else if (solverName == "dix") { solver.reset(new DIX()); }
+		else if (solverName == "acx") { solver.reset(new ACX()); }
 		else { throw runtime_error("unknown solver: " + solverName); }
 
 		cout << "reading input from " << inputsrc << "...\n";
