@@ -4,12 +4,13 @@
 
 #include "Solver.h"
 #include <vector>
+//#include <cstdint>
 
 class ACX : public Solver {
 	// C++11 <cstdint> types:
 	//	uint8_t		0 to           255	1 byte
-	//	int16_t		0 to        65,535	2 bytes
-	//	int32_t		0 to 4,294,967,295	4 bytes, same as Microsoft unsigned int
+	//	uint16_t	0 to        65,535	2 bytes
+	//	uint32_t	0 to 4,294,967,295	4 bytes, same as Microsoft unsigned int
 	using TI = unsigned int; // index type
 	unsigned int _pc; // primary constraints, size of _board or less
 	std::vector<TI> _board;
@@ -18,12 +19,14 @@ class ACX : public Solver {
 	bool _show;
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
+	void Search();
+	TI ChooseColumn() const;
 public:
-	ACX(){}
+	ACX() {}
 	void Init(const unsigned int pc, const unsigned int sc) override;
 	void Row(const unsigned int col) override;
 	void Col(const unsigned int col) override;
 	void Solve(const bool showSoln, std::function<void(Event)>CallBack) override;
-	ACX&operator=(const ACX&)=delete; // no assignment
-	ACX(const ACX&)=delete; // no copy constructor
+	ACX&operator=(const ACX&) = delete; // no assignment
+	ACX(const ACX&) = delete; // no copy constructor
 };

@@ -4,6 +4,7 @@
 #include "acx.h"
 #include <stdexcept>
 #include <iostream>
+#include <limits>
 using namespace std;
 
 // ---------- build data structure from input ----------
@@ -12,7 +13,7 @@ void ACX::Init(const unsigned int pc, const unsigned int sc)
 {
 	// primary constraint: cover this exactly once
 	// secondary constraint: cover this at most once
-	if (0 == pc+sc) { throw(runtime_error("zero constraint count")); }
+	if (0 == pc + sc) { throw(runtime_error("zero constraint count")); }
 	_pc = pc;
 	if (!_board.empty()) { throw(runtime_error("board already initialized")); }
 	_board.resize(pc + sc, 0); // all cover counts start at zero
@@ -47,4 +48,22 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	_notify = CallBack;
 	cout << "ACX::Solve, board size: " << _board.size() << ", tiles: " << _tile.size() << "\n";
 	ShrinkToFit(); // vector sizes are now unchanging, so trim extra space
+	Search();
 }
+
+void ACX::Search()
+{
+	const auto col(ChooseColumn());
+	if (!_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
+}
+
+ACX::TI ACX::ChooseColumn() const
+{
+	// minimize search space by selecting most constrained column
+	TI iMin(0); // assume first square on board
+	for (TI i(1); i < _board.size(); ++i) {
+		if (_board[iMin] > _board[i]) { iMin = i; }
+	}
+	return iMin;
+}
+
