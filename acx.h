@@ -17,6 +17,7 @@ class ACX : public Solver {
 	std::vector<Tile> _tile; // all available tiles
 	bool _show;
 	std::function<void(Event)> _notify;
+	void ShrinkToFit(); // optional optimization
 public:
 	ACX(){}
 	void Init(const unsigned int pc, const unsigned int sc) override;

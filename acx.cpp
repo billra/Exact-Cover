@@ -31,12 +31,20 @@ void ACX::Col(const unsigned int col)
 	_tile.back().push_back(col);
 }
 
+void ACX::ShrinkToFit()
+{
+	// call shrink_to_fit() on all vectors
+	_board.shrink_to_fit();
+	for (auto& t : _tile) { t.shrink_to_fit(); }
+	_tile.shrink_to_fit();
+}
+
 // ---------- solve exact cover problem ----------
 
 void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 {
 	_show = showSoln;
 	_notify = CallBack;
-
 	cout << "ACX::Solve, board size: " << _board.size() << ", tiles: " << _tile.size() << "\n";
+	ShrinkToFit(); // vector sizes are now unchanging, so trim extra space
 }
