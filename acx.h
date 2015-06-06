@@ -24,6 +24,7 @@ class ACX : public Solver {
 	void ShrinkToFit(); // optional optimization
 	void Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs);
 	void LayTile(Board& newBoard, TilesIdxs& newTilesidxs, const Tile& choice) const;
+	void MarkBoard(Board& board, const Tile& choice, const TI val) const;
 	bool Intersect(const Tile& tile1, const Tile& tile2) const;
 	void Subtract(Board& board, const Tile& tile) const;
 	TI ChooseColumn(const Board& board) const;

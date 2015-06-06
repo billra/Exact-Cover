@@ -75,6 +75,7 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 		Board newBoard(board); // start with board and subtract
 		TilesIdxs newTilesidxs(tilesidxs); // start full and remove
 		LayTile(newBoard, newTilesidxs, choice);
+		MarkBoard(newBoard, choice, numeric_limits<TI>::max());
 
 		soln.push_back(tilesidx);
 		Search(soln, newBoard, newTilesidxs);
@@ -97,11 +98,14 @@ void ACX::LayTile(Board& newBoard, TilesIdxs& newTilesidxs, const Tile& choice) 
 			++i;
 		}
 	}
+}
 
+void ACX::MarkBoard(Board & board, const Tile & choice, const TI val) const
+{
 	// choice tile board positions are now at zero coverage
 	// mark covered board squares
 	for (const auto& pos : choice) {
-		newBoard[pos] = numeric_limits<TI>::max();
+		board[pos] = val;
 	}
 }
 
