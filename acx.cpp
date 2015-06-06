@@ -73,11 +73,11 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 	for (const auto& tilesidx : choices) {
 		const auto& choice(_start_tiles[tilesidx]);
 		Board newBoard(board); // start with board and subtract
-		TilesIdxs newTiles; // start empty and add tiles
-		LayTile(newBoard, newTiles, tilesidxs, choice);
+		TilesIdxs newTilesidxs; // start empty and add tiles
+		LayTile(newBoard, newTilesidxs, tilesidxs, choice);
 
 		soln.push_back(tilesidx);
-		Search(soln, newBoard, newTiles);
+		Search(soln, newBoard, newTilesidxs);
 		soln.pop_back();
 	}
 	// todo: like original algorithm, can put choices back into play here
