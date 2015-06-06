@@ -15,29 +15,29 @@ void ACX::Init(const unsigned int pc, const unsigned int sc)
 	// secondary constraint: cover this at most once
 	if (0 == pc + sc) { throw(runtime_error("zero constraint count")); }
 	_pc = pc;
-	if (!_board.empty()) { throw(runtime_error("board already initialized")); }
-	_board.resize(pc + sc, 0); // all cover counts start at zero
+	if (!_start_board.empty()) { throw(runtime_error("board already initialized")); }
+	_start_board.resize(pc + sc, 0); // all cover counts start at zero
 }
 
 void ACX::Row(const unsigned int col)
 {
-	_tile.push_back(Tile()); // start a new tile
+	_start_tiles.push_back(Tile()); // start a new tile
 	Col(col);
 }
 
 void ACX::Col(const unsigned int col)
 {
-	if (col >= _board.size()) { throw(runtime_error("column index for tile out of board range")); }
-	++_board[col]; // increase cover count
-	_tile.back().push_back(col);
+	if (col >= _start_board.size()) { throw(runtime_error("column index for tile out of board range")); }
+	++_start_board[col]; // increase cover count
+	_start_tiles.back().push_back(col);
 }
 
 void ACX::ShrinkToFit()
 {
 	// call shrink_to_fit() on all vectors
-	_board.shrink_to_fit();
-	for (auto& t : _tile) { t.shrink_to_fit(); }
-	_tile.shrink_to_fit();
+	_start_board.shrink_to_fit();
+	for (auto& t : _start_tiles) { t.shrink_to_fit(); }
+	_start_tiles.shrink_to_fit();
 }
 
 // ---------- solve exact cover problem ----------
@@ -46,16 +46,16 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 {
 	_show = showSoln;
 	_notify = CallBack;
-	cout << "ACX::Solve, board size: " << _board.size() << ", tiles: " << _tile.size() << "\n";
+	cout << "ACX::Solve, board size: " << _start_board.size() << ", tiles: " << _start_tiles.size() << "\n";
 	ShrinkToFit(); // vector sizes are now unchanging, so trim extra space
 	vector<Tile> soln;
-	Search(soln, _board, _tile);
+	Search(soln, _start_board, _start_tiles);
 }
 
 void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>& tile)
 {
 	const auto col(ChooseColumn(board));
-	if (!_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
+	if (!_start_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
 
 	const auto choices(Covers(col)); // tiles which cover col
 	for (const auto& iChoose : choices) {
@@ -123,9 +123,9 @@ vector<ACX::TI> ACX::Covers(const TI col) const
 {
 	// linear search for tiles covering col (as fast or faster than following pointers? we will see...)
 	vector<TI> vt;
-	for (TI i(0); i < _tile.size(); ++i) { // all tiles
-		for (TI j(0); j < _tile[i].size(); ++j) { // each square in tile
-			if (col == _tile[i][j]) {
+	for (TI i(0); i < _start_tiles.size(); ++i) { // all tiles
+		for (TI j(0); j < _start_tiles[i].size(); ++j) { // each square in tile
+			if (col == _start_tiles[i][j]) {
 				vt.push_back(i);
 				break; // found in this tile, move immediately to next tile
 			}

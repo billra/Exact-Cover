@@ -12,10 +12,10 @@ class ACX : public Solver {
 	//	uint16_t	0 to        65,535	2 bytes
 	//	uint32_t	0 to 4,294,967,295	4 bytes, same as Microsoft unsigned int
 	using TI = unsigned int; // index type
-	unsigned int _pc; // primary constraints, size of _board or less
-	std::vector<TI> _board;
+	unsigned int _pc; // primary constraints, size of _start_board or less
+	std::vector<TI> _start_board;
 	using Tile = std::vector<TI>; // single tile
-	std::vector<Tile> _tile; // all available tiles
+	std::vector<Tile> _start_tiles; // all available tiles
 	bool _show;
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
