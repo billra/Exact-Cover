@@ -13,7 +13,7 @@ void ACX::Init(const unsigned int pc, const unsigned int sc)
 {
 	// primary constraint: cover this exactly once
 	// secondary constraint: cover this at most once
-	if (0 == pc + sc) { throw(runtime_error("zero constraint count")); }
+	if (!pc) { throw(runtime_error("no primary constraints")); }
 	_pc = pc;
 	if (!_start_board.empty()) { throw(runtime_error("board already initialized")); }
 	_start_board.resize(pc + sc, 0); // all cover counts start at zero
@@ -79,29 +79,28 @@ void ACX::Search(Tiles& soln, const Board& board, const Tiles& tiles)
 void ACX::LayTile(Board& newBoard, Tiles& newTiles, const Tiles& tiles, const Tile& choice) const
 {
 	// only copy tiles which do not collide
-	for (TI i(0); i < tiles.size(); ++i) { // all tiles
-		const auto& check(tiles[i]);
-		if (Intersect(choice, check)) {
-			Subtract(newBoard, check); // remove board coverage of discarded tile
+	for (const auto& tile : tiles) { // all tiles
+		if (Intersect(choice, tile)) {
+			Subtract(newBoard, tile); // remove board coverage of discarded tile
 			continue;
 		}
-		newTiles.push_back(check);
+		newTiles.push_back(tile);
 	}
 
 	// choice tile board positions are now at zero coverage
 	// mark covered board squares
-	for (TI i(0); i < choice.size(); ++i) {
-		newBoard[i] = numeric_limits<TI>::max();
+	for (const auto& pos : choice) {
+		newBoard[pos] = numeric_limits<TI>::max();
 	}
 }
 
 bool ACX::Intersect(const Tile& tile1, const Tile& tile2) const
 {
 	for (TI j(0), k(0); j < tile1.size() && k < tile2.size();) { // each square in tiles
-		const TI& node1(tile1[j]);
-		const TI& node2(tile2[k]);
-		if      (node1 < node2) { ++j; }
-		else if (node1 > node2) { ++k; }
+		const TI& pos1(tile1[j]);
+		const TI& pos2(tile2[k]);
+		if      (pos1 < pos2) { ++j; }
+		else if (pos1 > pos2) { ++k; }
 		else { return true; } // collision
 	}
 	return false;
@@ -109,8 +108,8 @@ bool ACX::Intersect(const Tile& tile1, const Tile& tile2) const
 
 void ACX::Subtract(Board& board, const Tile& tile) const
 {
-	for (TI i(0); i < tile.size(); ++i) { // all nodes in tile
-		--board[tile[i]];
+	for (const auto& pos : tile) { // all positions in tile
+		--board[pos];
 	}
 }
 
@@ -130,8 +129,8 @@ vector<ACX::TI> ACX::Covers(const TI col, const Tiles& tiles) const
 	Tile vt;
 	for (TI i(0); i < tiles.size(); ++i) { // all tiles
 		const Tile& tile(tiles[i]);
-		for (TI j(0); j < tile.size(); ++j) { // each square in tile
-			if (col == tile[j]) {
+		for (const auto& pos : tile) { // each position in tile
+			if (col == pos) {
 				vt.push_back(i);
 				break; // col found in this tile, move immediately to next tile
 			}
@@ -143,10 +142,9 @@ vector<ACX::TI> ACX::Covers(const TI col, const Tiles& tiles) const
 void ACX::ShowSoln(const Tiles& soln)
 {
 	cout << "[\n";
-	for (TI i(0); i < soln.size(); ++i) { // all tiles
-		const Tile& tile(soln[i]);
-		for (TI j(0); j < tile.size(); ++j) { // each square in tile
-			cout << tile[j] << " ";
+	for (const auto& tile : soln) { // all tiles
+		for (const auto& pos : tile) { // each position in tile
+			cout << pos << " ";
 		}
 		cout << "\n";
 	}
