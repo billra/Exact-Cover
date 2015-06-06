@@ -49,14 +49,17 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	cout << "ACX::Solve, board size: " << _start_board.size() << ", tiles: " << _start_tiles.size() << "\n";
 	ShrinkToFit(); // vector sizes are now unchanging, so trim extra space
 	Tiles soln;
+	_notify(Event::Begin);
 	Search(soln, _start_board, _start_tiles);
+	_notify(Event::End);
+
 }
 
 void ACX::Search(Tiles& soln, const Board& board, const Tiles& tiles)
 {
 	const auto col(ChooseColumn(board));
-	if (!_start_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
-	if (numeric_limits<TI>::max() == _start_board[col]) { // all primary constraint board positions are covered
+	if (!board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
+	if (numeric_limits<TI>::max() == board[col]) { // all primary constraint board positions are covered
 		_notify(Event::Soln);
 		if (_show) { ShowSoln(soln); }
 		return;
@@ -65,13 +68,12 @@ void ACX::Search(Tiles& soln, const Board& board, const Tiles& tiles)
 	const auto choices(Covers(col,tiles)); // tiles which cover col
 	for (const auto& iChoose : choices) {
 		const auto& choice(tiles[iChoose]);
-		soln.push_back(choice);
 		Board newBoard(board); // start with board and subtract
 		Tiles newTiles; // start empty and add tiles
 		LayTile(newBoard, newTiles, tiles, choice);
 
-		// todo: recurse, check...
-
+		soln.push_back(choice); // todo: could push back a pointer instead of a tile
+		Search(soln, newBoard, newTiles);
 		soln.pop_back();
 	}
 }
