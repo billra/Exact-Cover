@@ -56,7 +56,11 @@ void ACX::Search(Tiles& soln, const Board& board, const Tiles& tiles)
 {
 	const auto col(ChooseColumn(board));
 	if (!_start_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
-	// todo: check done
+	if (numeric_limits<TI>::max() == _start_board[col]) { // all primary constraint board positions are covered
+		_notify(Event::Soln);
+		if (_show) { ShowSoln(soln); }
+		return;
+	}
 
 	const auto choices(Covers(col,tiles)); // tiles which cover col
 	for (const auto& iChoose : choices) {
@@ -134,5 +138,18 @@ vector<ACX::TI> ACX::Covers(const TI col, const Tiles& tiles) const
 		}
 	}
 	return vt; // elided
+}
+
+void ACX::ShowSoln(const Tiles& soln)
+{
+	cout << "[\n";
+	for (TI i(0); i < soln.size(); ++i) { // all tiles
+		const Tile& tile(soln[i]);
+		for (TI j(0); j < tile.size(); ++j) { // each square in tile
+			cout << tile[j] << " ";
+		}
+		cout << "\n";
+	}
+	cout << "]\n";
 }
 

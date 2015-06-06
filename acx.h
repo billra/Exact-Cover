@@ -27,6 +27,7 @@ class ACX : public Solver {
 	void Subtract(Board& board, const Tile& tile) const;
 	TI ChooseColumn(const Board& board) const;
 	std::vector<TI> Covers(const TI col, const Tiles& tiles) const;
+	void ShowSoln(const Tiles& soln);
 public:
 	ACX() {}
 	void Init(const unsigned int pc, const unsigned int sc) override;
