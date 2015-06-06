@@ -73,8 +73,8 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 	for (const auto& tilesidx : choices) {
 		const auto& choice(_start_tiles[tilesidx]);
 		Board newBoard(board); // start with board and subtract
-		TilesIdxs newTilesidxs; // start empty and add tiles
-		LayTile(newBoard, newTilesidxs, tilesidxs, choice);
+		TilesIdxs newTilesidxs(tilesidxs); // start full and remove
+		LayTile(newBoard, newTilesidxs, choice);
 
 		soln.push_back(tilesidx);
 		Search(soln, newBoard, newTilesidxs);
@@ -83,16 +83,19 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 	// todo: like original algorithm, can put choices back into play here
 }
 
-void ACX::LayTile(Board& newBoard, TilesIdxs& newTilesidxs, const TilesIdxs& tilesidxs, const Tile& choice) const
+void ACX::LayTile(Board& newBoard, TilesIdxs& newTilesidxs, const Tile& choice) const
 {
 	// only copy tiles which do not collide
-	for (const auto& tilesidx : tilesidxs) { // all indices
+	for (TI i(0); i < newTilesidxs.size();) {
+		const auto&tilesidx(newTilesidxs[i]);
 		const auto& tile(_start_tiles[tilesidx]); // extra work compared to passing index instead of tile
 		if (Intersect(choice, tile)) {
 			Subtract(newBoard, tile); // remove board coverage of discarded tile
-			continue;
+			newTilesidxs.erase(newTilesidxs.begin() + i); // expensive? -> no
 		}
-		newTilesidxs.push_back(tilesidx);
+		else {
+			++i;
+		}
 	}
 
 	// choice tile board positions are now at zero coverage
