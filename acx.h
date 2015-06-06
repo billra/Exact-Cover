@@ -13,17 +13,18 @@ class ACX : public Solver {
 	//	uint32_t	0 to 4,294,967,295	4 bytes, same as Microsoft unsigned int
 	using TI = unsigned int; // index type
 	unsigned int _pc; // primary constraints, size of _start_board or less
-	std::vector<TI> _start_board;
-	using Tile = std::vector<TI>; // single tile
+	using Board = std::vector<TI>;
+	Board _start_board;
+	using Tile = std::vector<TI>;
 	std::vector<Tile> _start_tiles; // all available tiles
 	bool _show;
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
-	void Search(std::vector<Tile>& soln, const std::vector<TI>& board, const std::vector<Tile>& tiles);
-	void LayTile(std::vector<TI>& newBoard, std::vector<Tile>& newTiles, const std::vector<TI>& board, const std::vector<Tile>& tiles, const Tile& choice) const;
+	void Search(std::vector<Tile>& soln, const Board& board, const std::vector<Tile>& tiles);
+	void LayTile(Board& newBoard, std::vector<Tile>& newTiles, const Board& board, const std::vector<Tile>& tiles, const Tile& choice) const;
 	bool Intersect(const Tile& tile1, const Tile& tile2) const;
-	void Subtract(std::vector<TI>& board, const Tile& tile) const;
-	TI ChooseColumn(const std::vector<TI>& board) const;
+	void Subtract(Board& board, const Tile& tile) const;
+	TI ChooseColumn(const Board& board) const;
 	std::vector<TI> Covers(const TI col, const std::vector<Tile>& tiles) const;
 public:
 	ACX() {}

@@ -52,7 +52,7 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	Search(soln, _start_board, _start_tiles);
 }
 
-void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>& tiles)
+void ACX::Search(vector<Tile>& soln, const Board& board, const vector<Tile>& tiles)
 {
 	const auto col(ChooseColumn(board));
 	if (!_start_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
@@ -62,7 +62,7 @@ void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>
 	for (const auto& iChoose : choices) {
 		const auto& choice(tiles[iChoose]);
 		soln.push_back(choice);
-		vector<TI> newBoard(board);
+		Board newBoard(board);
 		vector<Tile> newTile;
 		LayTile(newBoard, newTile, board, tiles, choice);
 
@@ -72,7 +72,7 @@ void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>
 	}
 }
 
-void ACX::LayTile(vector<TI>& newBoard, vector<Tile>& newTiles, const vector<TI>& board, const vector<Tile>& tiles, const Tile& choice) const
+void ACX::LayTile(Board& newBoard, vector<Tile>& newTiles, const Board& board, const vector<Tile>& tiles, const Tile& choice) const
 {
 	// only copy tiles which do not collide
 	for (TI i(0); i < tiles.size(); ++i) { // all tiles
@@ -103,14 +103,14 @@ bool ACX::Intersect(const Tile& tile1, const Tile& tile2) const
 	return false;
 }
 
-void ACX::Subtract(vector<TI>& board, const Tile& tile) const
+void ACX::Subtract(Board& board, const Tile& tile) const
 {
 	for (TI i(0); i < tile.size(); ++i) { // all nodes in tile
 		--board[tile[i]];
 	}
 }
 
-ACX::TI ACX::ChooseColumn(const vector<TI>& board) const
+ACX::TI ACX::ChooseColumn(const Board& board) const
 {
 	// minimize search space by selecting most constrained column
 	TI iMin(0); // assume first square on board
