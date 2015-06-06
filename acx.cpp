@@ -69,6 +69,7 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 	}
 
 	const auto choices(Covers(col,tilesidxs)); // tiles which cover col
+	// todo: like original algorithm, can take choices out of play here
 	for (const auto& tilesidx : choices) {
 		const auto& choice(_start_tiles[tilesidx]);
 		Board newBoard(board); // start with board and subtract
@@ -79,6 +80,7 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 		Search(soln, newBoard, newTiles);
 		soln.pop_back();
 	}
+	// todo: like original algorithm, can put choices back into play here
 }
 
 void ACX::LayTile(Board& newBoard, TilesIdxs& newTilesidxs, const TilesIdxs& tilesidxs, const Tile& choice) const
