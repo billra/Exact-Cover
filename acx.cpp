@@ -58,7 +58,7 @@ void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>
 	if (!_start_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
 	// todo: check done for _pc constraints
 
-	const auto choices(Covers(col)); // tiles which cover col
+	const auto choices(Covers(col,tiles)); // tiles which cover col
 	for (const auto& iChoose : choices) {
 		const auto& choice(tiles[iChoose]);
 		soln.push_back(choice);
@@ -120,15 +120,16 @@ ACX::TI ACX::ChooseColumn(const vector<TI>& board) const
 	return iMin;
 }
 
-vector<ACX::TI> ACX::Covers(const TI col) const
+vector<ACX::TI> ACX::Covers(const TI col, const vector<Tile>& tiles) const
 {
 	// linear search for tiles covering col (as fast or faster than following pointers? we will see...)
 	vector<TI> vt;
-	for (TI i(0); i < _start_tiles.size(); ++i) { // all tiles
-		for (TI j(0); j < _start_tiles[i].size(); ++j) { // each square in tile
-			if (col == _start_tiles[i][j]) {
+	for (TI i(0); i < tiles.size(); ++i) { // all tiles
+		const vector<TI>& tile(tiles[i]);
+		for (TI j(0); j < tile.size(); ++j) { // each square in tile
+			if (col == tile[j]) {
 				vt.push_back(i);
-				break; // found in this tile, move immediately to next tile
+				break; // col found in this tile, move immediately to next tile
 			}
 		}
 	}

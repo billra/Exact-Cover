@@ -24,7 +24,7 @@ class ACX : public Solver {
 	bool Intersect(const std::vector<TI>& tile1, const std::vector<TI>& tile2) const;
 	void Subtract(std::vector<TI>& board, const std::vector<TI>& tile) const;
 	TI ChooseColumn(const std::vector<TI>& board) const;
-	std::vector<TI> Covers(const TI col) const;
+	std::vector<TI> Covers(const TI col, const std::vector<Tile>& tiles) const;
 public:
 	ACX() {}
 	void Init(const unsigned int pc, const unsigned int sc) override;
