@@ -56,7 +56,7 @@ void ACX::Search(Tiles& soln, const Board& board, const Tiles& tiles)
 {
 	const auto col(ChooseColumn(board));
 	if (!_start_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
-	// todo: check done for _pc constraints
+	// todo: check done
 
 	const auto choices(Covers(col,tiles)); // tiles which cover col
 	for (const auto& iChoose : choices) {
@@ -114,7 +114,7 @@ ACX::TI ACX::ChooseColumn(const Board& board) const
 {
 	// minimize search space by selecting most constrained column
 	TI iMin(0); // assume first square on board
-	for (TI i(1); i < board.size(); ++i) {
+	for (TI i(1); i < _pc; ++i) { // limit search to primary constraints
 		if (board[iMin] > board[i]) { iMin = i; }
 	}
 	return iMin;
