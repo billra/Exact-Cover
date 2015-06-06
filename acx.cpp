@@ -52,18 +52,19 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	Search(soln, _start_board, _start_tiles);
 }
 
-void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>& tile)
+void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>& tiles)
 {
 	const auto col(ChooseColumn(board));
 	if (!_start_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
+	// todo: check done for _pc constraints
 
 	const auto choices(Covers(col)); // tiles which cover col
 	for (const auto& iChoose : choices) {
-		const auto& choice(tile[iChoose]);
+		const auto& choice(tiles[iChoose]);
 		soln.push_back(choice);
 		vector<TI> newBoard(board);
 		vector<Tile> newTile;
-		LayTile(newBoard, newTile, board, tile, choice);
+		LayTile(newBoard, newTile, board, tiles, choice);
 
 		// todo: recurse, check...
 
@@ -71,16 +72,16 @@ void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>
 	}
 }
 
-void ACX::LayTile(vector<TI>& newBoard, vector<Tile>& newTile, const vector<TI>& board, const vector<Tile>& tile, const vector<TI>& choice) const
+void ACX::LayTile(vector<TI>& newBoard, vector<Tile>& newTiles, const vector<TI>& board, const vector<Tile>& tiles, const vector<TI>& choice) const
 {
 	// only copy tiles which do not collide
-	for (TI i(0); i < tile.size(); ++i) { // all tiles
-		const auto& check(tile[i]);
+	for (TI i(0); i < tiles.size(); ++i) { // all tiles
+		const auto& check(tiles[i]);
 		if (Intersect(choice, check)) { 
 			Subtract(newBoard, check); // remove board coverage of discarded tile
 			continue; 
 		}
-		newTile.push_back(check);
+		newTiles.push_back(check);
 	}
 
 	// choice tile board positions are now at zero coverage
