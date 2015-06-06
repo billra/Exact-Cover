@@ -90,13 +90,9 @@ void ACX::LayTile(Board& newBoard, TilesIdxs& newTilesidxs, const Tile& choice) 
 	for (TI i(0); i < newTilesidxs.size();) {
 		const auto&tilesidx(newTilesidxs[i]);
 		const auto& tile(_start_tiles[tilesidx]); // extra work compared to passing index instead of tile
-		if (Intersect(choice, tile)) {
-			Subtract(newBoard, tile); // remove board coverage of discarded tile
-			newTilesidxs.erase(newTilesidxs.begin() + i); // expensive? -> no
-		}
-		else {
-			++i;
-		}
+		if (!Intersect(choice, tile)) {	++i; continue;	}
+		Subtract(newBoard, tile); // remove board coverage of discarded tile
+		newTilesidxs.erase(newTilesidxs.begin() + i); // expensive? -> no
 	}
 }
 
