@@ -16,16 +16,17 @@ class ACX : public Solver {
 	using Board = std::vector<TI>;
 	Board _start_board;
 	using Tile = std::vector<TI>;
-	std::vector<Tile> _start_tiles; // all available tiles
+	using Tiles = std::vector<Tile>;
+	Tiles _start_tiles; // all available tiles
 	bool _show;
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
-	void Search(std::vector<Tile>& soln, const Board& board, const std::vector<Tile>& tiles);
-	void LayTile(Board& newBoard, std::vector<Tile>& newTiles, const Board& board, const std::vector<Tile>& tiles, const Tile& choice) const;
+	void Search(Tiles& soln, const Board& board, const Tiles& tiles);
+	void LayTile(Board& newBoard, Tiles& newTiles, const Board& board, const Tiles& tiles, const Tile& choice) const;
 	bool Intersect(const Tile& tile1, const Tile& tile2) const;
 	void Subtract(Board& board, const Tile& tile) const;
 	TI ChooseColumn(const Board& board) const;
-	std::vector<TI> Covers(const TI col, const std::vector<Tile>& tiles) const;
+	std::vector<TI> Covers(const TI col, const Tiles& tiles) const;
 public:
 	ACX() {}
 	void Init(const unsigned int pc, const unsigned int sc) override;

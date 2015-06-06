@@ -48,11 +48,11 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	_notify = CallBack;
 	cout << "ACX::Solve, board size: " << _start_board.size() << ", tiles: " << _start_tiles.size() << "\n";
 	ShrinkToFit(); // vector sizes are now unchanging, so trim extra space
-	vector<Tile> soln;
+	Tiles soln;
 	Search(soln, _start_board, _start_tiles);
 }
 
-void ACX::Search(vector<Tile>& soln, const Board& board, const vector<Tile>& tiles)
+void ACX::Search(Tiles& soln, const Board& board, const Tiles& tiles)
 {
 	const auto col(ChooseColumn(board));
 	if (!_start_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
@@ -63,8 +63,8 @@ void ACX::Search(vector<Tile>& soln, const Board& board, const vector<Tile>& til
 		const auto& choice(tiles[iChoose]);
 		soln.push_back(choice);
 		Board newBoard(board);
-		vector<Tile> newTile;
-		LayTile(newBoard, newTile, board, tiles, choice);
+		Tiles newTiles;
+		LayTile(newBoard, newTiles, board, tiles, choice);
 
 		// todo: recurse, check...
 
@@ -72,7 +72,7 @@ void ACX::Search(vector<Tile>& soln, const Board& board, const vector<Tile>& til
 	}
 }
 
-void ACX::LayTile(Board& newBoard, vector<Tile>& newTiles, const Board& board, const vector<Tile>& tiles, const Tile& choice) const
+void ACX::LayTile(Board& newBoard, Tiles& newTiles, const Board& board, const Tiles& tiles, const Tile& choice) const
 {
 	// only copy tiles which do not collide
 	for (TI i(0); i < tiles.size(); ++i) { // all tiles
@@ -120,7 +120,7 @@ ACX::TI ACX::ChooseColumn(const Board& board) const
 	return iMin;
 }
 
-vector<ACX::TI> ACX::Covers(const TI col, const vector<Tile>& tiles) const
+vector<ACX::TI> ACX::Covers(const TI col, const Tiles& tiles) const
 {
 	// linear search for tiles covering col (as fast or faster than following pointers? we will see...)
 	Tile vt;
