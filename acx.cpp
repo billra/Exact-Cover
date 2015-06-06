@@ -48,32 +48,65 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	_notify = CallBack;
 	cout << "ACX::Solve, board size: " << _board.size() << ", tiles: " << _tile.size() << "\n";
 	ShrinkToFit(); // vector sizes are now unchanging, so trim extra space
-	Search(_board, _tile);
+	vector<Tile> soln;
+	Search(soln, _board, _tile);
 }
 
-void ACX::Search(const vector<TI>& board, const vector<Tile>& tile)
+void ACX::Search(vector<Tile>& soln, const vector<TI>& board, const vector<Tile>& tile)
 {
 	const auto col(ChooseColumn(board));
 	if (!_board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
 
 	const auto choices(Covers(col)); // tiles which cover col
-	for (const auto& iTile : choices) {
-		const auto newBoard(TileBoard(board, tile[iTile]));
-		const auto newTile(RemoveConflicts(tile, iTile));
-		// recurse...
+	for (const auto& iChoose : choices) {
+		const auto& choice(tile[iChoose]);
+		soln.push_back(choice);
+		vector<TI> newBoard(board);
+		vector<Tile> newTile;
+		LayTile(newBoard, newTile, board, tile, choice);
+
+		// todo: recurse, check...
+
+		soln.pop_back();
 	}
 }
 
-std::vector<ACX::TI> ACX::TileBoard(const vector<TI>& board, const vector<TI>& tile) const
+void ACX::LayTile(vector<TI>& newBoard, vector<Tile>& newTile, const vector<TI>& board, const vector<Tile>& tile, const vector<TI>& choice) const
 {
-	// todo
-	return vector<TI>();
+	// only copy tiles which do not collide
+	for (TI i(0); i < tile.size(); ++i) { // all tiles
+		const auto& check(tile[i]);
+		if (Intersect(choice, check)) { 
+			Subtract(newBoard, check); // remove board coverage of discarded tile
+			continue; 
+		}
+		newTile.push_back(check);
+	}
+
+	// choice tile board positions are now at zero coverage
+	// mark covered board squares
+	for (TI i(0); i < choice.size(); ++i) {
+		newBoard[i]= numeric_limits<TI>::max(); 
+	}
 }
 
-std::vector<ACX::Tile> ACX::RemoveConflicts(const vector<Tile>& tile, const TI iTile) const
+bool ACX::Intersect(const std::vector<TI>& tile1, const std::vector<TI>& tile2) const
 {
-	// todo
-	return vector<ACX::Tile>();
+	for (TI j(0), k(0); j < tile1.size() && k < tile2.size();) { // each square in tiles
+		const TI& node1(tile1[j]);
+		const TI& node2(tile2[k]);
+		if      (node1 < node2) { ++j; }
+		else if (node1 > node2) { ++k; }
+		else { return true; } // collision
+	}
+	return false;
+}
+
+void ACX::Subtract(vector<TI>& board, const vector<TI>& tile) const
+{
+	for (TI i(0); i < tile.size(); ++i) { // all nodes in tile
+		--board[tile[i]];
+	}
 }
 
 ACX::TI ACX::ChooseColumn(const vector<TI>& board) const
@@ -90,8 +123,8 @@ vector<ACX::TI> ACX::Covers(const TI col) const
 {
 	// linear search for tiles covering col (as fast or faster than following pointers? we will see...)
 	vector<TI> vt;
-	for (TI i(0); i < _tile.size(); ++i) {
-		for (TI j(0); j < _tile[i].size(); ++j) {
+	for (TI i(0); i < _tile.size(); ++i) { // all tiles
+		for (TI j(0); j < _tile[i].size(); ++j) { // each square in tile
 			if (col == _tile[i][j]) {
 				vt.push_back(i);
 				break; // found in this tile, move immediately to next tile

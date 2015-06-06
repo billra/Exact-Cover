@@ -19,9 +19,10 @@ class ACX : public Solver {
 	bool _show;
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
-	void Search(const std::vector<TI>& board, const std::vector<Tile>& tile);
-	std::vector<TI> TileBoard(const std::vector<TI>& board, const std::vector<TI>& tile) const;
-	std::vector<Tile> RemoveConflicts(const std::vector<Tile>& tile, const TI iTile) const;
+	void Search(std::vector<Tile>& soln, const std::vector<TI>& board, const std::vector<Tile>& tile);
+	void LayTile(std::vector<TI>& newBoard, std::vector<Tile>& newTile, const std::vector<TI>& board, const std::vector<Tile>& tile, const std::vector<TI>& choice) const;
+	bool Intersect(const std::vector<TI>& tile1, const std::vector<TI>& tile2) const;
+	void Subtract(std::vector<TI>& board, const std::vector<TI>& tile) const;
 	TI ChooseColumn(const std::vector<TI>& board) const;
 	std::vector<TI> Covers(const TI col) const;
 public:
