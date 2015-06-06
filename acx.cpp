@@ -62,9 +62,9 @@ void ACX::Search(Tiles& soln, const Board& board, const Tiles& tiles)
 	for (const auto& iChoose : choices) {
 		const auto& choice(tiles[iChoose]);
 		soln.push_back(choice);
-		Board newBoard(board);
-		Tiles newTiles;
-		LayTile(newBoard, newTiles, board, tiles, choice);
+		Board newBoard(board); // start with board and subtract
+		Tiles newTiles; // start empty and add tiles
+		LayTile(newBoard, newTiles, tiles, choice);
 
 		// todo: recurse, check...
 
@@ -72,14 +72,14 @@ void ACX::Search(Tiles& soln, const Board& board, const Tiles& tiles)
 	}
 }
 
-void ACX::LayTile(Board& newBoard, Tiles& newTiles, const Board& board, const Tiles& tiles, const Tile& choice) const
+void ACX::LayTile(Board& newBoard, Tiles& newTiles, const Tiles& tiles, const Tile& choice) const
 {
 	// only copy tiles which do not collide
 	for (TI i(0); i < tiles.size(); ++i) { // all tiles
 		const auto& check(tiles[i]);
-		if (Intersect(choice, check)) { 
+		if (Intersect(choice, check)) {
 			Subtract(newBoard, check); // remove board coverage of discarded tile
-			continue; 
+			continue;
 		}
 		newTiles.push_back(check);
 	}
@@ -87,7 +87,7 @@ void ACX::LayTile(Board& newBoard, Tiles& newTiles, const Board& board, const Ti
 	// choice tile board positions are now at zero coverage
 	// mark covered board squares
 	for (TI i(0); i < choice.size(); ++i) {
-		newBoard[i]= numeric_limits<TI>::max(); 
+		newBoard[i] = numeric_limits<TI>::max();
 	}
 }
 
