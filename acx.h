@@ -23,12 +23,13 @@ class ACX : public Solver {
 	std::function<void(Event)> _notify;
 	void ShrinkToFit(); // optional optimization
 	void Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs) const;
+	TilesIdxs RemoveTiles(Board& board, TilesIdxs& tilesidxs, const TI col) const;
 	void RemoveTiles(Board& board, TilesIdxs& tilesidxs, const Tile& choice) const;
+	bool Intersect(const Tile& tile, const TI col) const;
 	bool Intersect(const Tile& tile1, const Tile& tile2) const;
 	void MarkBoard(Board& board, const Tile& choice, const TI val) const;
 	void Subtract(Board& board, const Tile& tile) const;
 	TI ChooseColumn(const Board& board) const;
-	TilesIdxs Covers(const TI col, const TilesIdxs& tilesidxs) const;
 	void ShowSoln(const TilesIdxs& soln) const;
 public:
 	ACX() {}

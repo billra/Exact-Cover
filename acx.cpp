@@ -67,32 +67,61 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 		if (_show) { ShowSoln(soln); }
 		return;
 	}
+	// Minimize work by finding least covered column. A set of tile choices covers
+	// this column. Minimize work by removing these choices once instead of each
+	// time through the choice loop.
+	Board boardNC(board); // start with board and subtract
+	TilesIdxs tilesidxsNC(tilesidxs); // start full and remove
+	const auto choices(RemoveTiles(boardNC, tilesidxsNC, col)); // remove tiles covering col, return list of tiles
 
-	const auto choices(Covers(col,tilesidxs)); // tiles which cover col
 	// todo: like original algorithm, can take choices out of play here
 	for (const auto& tilesidx : choices) {
 		const auto& choice(_start_tiles[tilesidx]);
-		Board newBoard(board); // start with board and subtract
-		TilesIdxs newTilesidxs(tilesidxs); // start full and remove
+		Board newBoard(boardNC); // start with board and subtract
+		TilesIdxs newTilesidxs(tilesidxsNC); // start full and remove
 		RemoveTiles(newBoard, newTilesidxs, choice);
+
+		// todo: can move up and do preliminary check for not coverable board positions
+		//	instead of RemoveTiles(...choice) work and check after recursion
 		MarkBoard(newBoard, choice, numeric_limits<TI>::max());
 
 		soln.push_back(tilesidx);
 		Search(soln, newBoard, newTilesidxs);
 		soln.pop_back();
 	}
-	// todo: like original algorithm, can put choices back into play here
+}
+
+ACX::TilesIdxs ACX::RemoveTiles(Board& board, TilesIdxs& tilesidxs, const TI col) const
+{
+	TilesIdxs removed;
+	for (TI i(0); i < tilesidxs.size();) { // tiles which intersect col and are removed
+		const auto& tilesidx(tilesidxs[i]);
+		const auto& tile(_start_tiles[tilesidx]);
+		if (!Intersect(tile, col)) { ++i;  continue; }
+		removed.push_back(tilesidx);
+		Subtract(board, tile);
+		tilesidxs.erase(tilesidxs.begin() + i); // expensive? -> no
+	}
+	return removed; // elided
 }
 
 void ACX::RemoveTiles(Board& board, TilesIdxs& tilesidxs, const Tile& choice) const
 {
 	for (TI i(0); i < tilesidxs.size();) { // tiles which intersect tile and are removed
-		const auto&tilesidx(tilesidxs[i]);
+		const auto& tilesidx(tilesidxs[i]);
 		const auto& tile(_start_tiles[tilesidx]);
 		if (!Intersect(tile, choice)) {	++i; continue;	}
 		Subtract(board, tile);
 		tilesidxs.erase(tilesidxs.begin() + i); // expensive? -> no
 	}
+}
+
+bool ACX::Intersect(const Tile& tile, const TI col) const
+{
+	for (const auto& pos : tile) {
+		if (col == pos) { return true; }
+	}
+	return false;
 }
 
 bool ACX::Intersect(const Tile& tile1, const Tile& tile2) const
@@ -131,22 +160,6 @@ ACX::TI ACX::ChooseColumn(const Board& board) const
 		if (board[iMin] > board[i]) { iMin = i; }
 	}
 	return iMin;
-}
-
-ACX::TilesIdxs ACX::Covers(const TI col, const TilesIdxs& tilesidxs) const
-{
-	// linear search for tiles covering col (as fast or faster than following pointers? we will see...)
-	TilesIdxs vti;
-	for (const auto& tilesidx : tilesidxs) { // all tile indices
-		const Tile& tile(_start_tiles[tilesidx]);
-		for (const auto& pos : tile) { // each position in tile
-			if (col == pos) {
-				vti.push_back(tilesidx);
-				break; // col found in this tile, move immediately to next tile
-			}
-		}
-	}
-	return vti; // elided
 }
 
 void ACX::ShowSoln(const TilesIdxs& soln) const
