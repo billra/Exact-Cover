@@ -96,15 +96,6 @@ void ACX::LayTile(Board& newBoard, TilesIdxs& newTilesidxs, const Tile& choice) 
 	}
 }
 
-void ACX::MarkBoard(Board & board, const Tile & choice, const TI val) const
-{
-	// choice tile board positions are now at zero coverage
-	// mark covered board squares
-	for (const auto& pos : choice) {
-		board[pos] = val;
-	}
-}
-
 bool ACX::Intersect(const Tile& tile1, const Tile& tile2) const
 {
 	for (TI j(0), k(0); j < tile1.size() && k < tile2.size();) { // each square in tiles
@@ -115,6 +106,15 @@ bool ACX::Intersect(const Tile& tile1, const Tile& tile2) const
 		else { return true; } // collision
 	}
 	return false;
+}
+
+void ACX::MarkBoard(Board & board, const Tile & choice, const TI val) const
+{
+	// choice tile board positions are now at zero coverage
+	// mark covered board squares
+	for (const auto& pos : choice) {
+		board[pos] = val;
+	}
 }
 
 void ACX::Subtract(Board& board, const Tile& tile) const
