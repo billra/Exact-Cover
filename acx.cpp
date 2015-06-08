@@ -58,7 +58,7 @@ void ACX::Solve(const bool showSoln, std::function<void(Event)> CallBack)
 	_notify(Event::End);
 }
 
-void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs)
+void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs) const
 {
 	const auto col(ChooseColumn(board));
 	if (!board[col]) { return; } // a column could not be covered with remaining tiles, abort this search branch
@@ -150,7 +150,7 @@ ACX::TilesIdxs ACX::Covers(const TI col, const TilesIdxs& tilesidxs) const
 	return vti; // elided
 }
 
-void ACX::ShowSoln(const TilesIdxs& soln)
+void ACX::ShowSoln(const TilesIdxs& soln) const
 {
 	cout << "[\n";
 	for (const auto& tilesidx : soln) { // all solution tile indices
