@@ -74,7 +74,7 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 		const auto& choice(_start_tiles[tilesidx]);
 		Board newBoard(board); // start with board and subtract
 		TilesIdxs newTilesidxs(tilesidxs); // start full and remove
-		LayTile(newBoard, newTilesidxs, choice);
+		RemoveTiles(newBoard, newTilesidxs, choice);
 		MarkBoard(newBoard, choice, numeric_limits<TI>::max());
 
 		soln.push_back(tilesidx);
@@ -84,15 +84,14 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 	// todo: like original algorithm, can put choices back into play here
 }
 
-void ACX::LayTile(Board& newBoard, TilesIdxs& newTilesidxs, const Tile& choice) const
+void ACX::RemoveTiles(Board& board, TilesIdxs& tilesidxs, const Tile& choice) const
 {
-	// only copy tiles which do not collide
-	for (TI i(0); i < newTilesidxs.size();) {
-		const auto&tilesidx(newTilesidxs[i]);
-		const auto& tile(_start_tiles[tilesidx]); // extra work compared to passing index instead of tile
-		if (!Intersect(choice, tile)) {	++i; continue;	}
-		Subtract(newBoard, tile); // remove board coverage of discarded tile
-		newTilesidxs.erase(newTilesidxs.begin() + i); // expensive? -> no
+	for (TI i(0); i < tilesidxs.size();) { // tiles which intersect tile and are removed
+		const auto&tilesidx(tilesidxs[i]);
+		const auto& tile(_start_tiles[tilesidx]);
+		if (!Intersect(tile, choice)) {	++i; continue;	}
+		Subtract(board, tile);
+		tilesidxs.erase(tilesidxs.begin() + i); // expensive? -> no
 	}
 }
 
