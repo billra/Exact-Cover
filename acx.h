@@ -24,11 +24,13 @@ class ACX : public Solver {
 	void ShrinkToFit(); // optional optimization
 	void Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs) const;
 	TilesIdxs RemoveTiles(Board& board, TilesIdxs& tilesidxs, const TI col) const;
-	void RemoveTiles(Board& board, TilesIdxs& tilesidxs, const Tile& choice) const;
+	TilesIdxs RemoveTiles(Board& board, TilesIdxs& tilesidxs, const Tile& choice) const;
+	void AddTiles(Board& board, TilesIdxs& tilesidxs, const TilesIdxs& removed) const;
 	bool Intersect(const Tile& tile, const TI col) const;
 	bool Intersect(const Tile& tile1, const Tile& tile2) const;
 	void MarkBoard(Board& board, const Tile& choice, const TI val) const;
 	void Subtract(Board& board, const Tile& tile) const;
+	void Add(Board& board, const Tile& tile) const;
 	TI ChooseColumn(const Board& board) const;
 	void ShowSoln(const TilesIdxs& soln) const;
 public:

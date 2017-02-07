@@ -74,20 +74,21 @@ void ACX::Search(TilesIdxs& soln, const Board& board, const TilesIdxs& tilesidxs
 	TilesIdxs tilesidxsNC(tilesidxs); // start full and remove
 	const auto choices(RemoveTiles(boardNC, tilesidxsNC, col)); // remove tiles covering col, return list of tiles
 
-	// todo: like original algorithm, can take choices out of play here
 	for (const auto& tilesidx : choices) {
 		const auto& choice(_start_tiles[tilesidx]);
-		Board newBoard(boardNC); // start with board and subtract
-		TilesIdxs newTilesidxs(tilesidxsNC); // start full and remove
-		RemoveTiles(newBoard, newTilesidxs, choice);
-
-		// todo: can move up and do preliminary check for not coverable board positions
-		//	instead of RemoveTiles(...choice) work and check after recursion
-		MarkBoard(newBoard, choice, numeric_limits<TI>::max());
+		const auto removed(RemoveTiles(boardNC, tilesidxsNC, choice));
+		MarkBoard(boardNC, choice, numeric_limits<TI>::max());
+		// slower:
+		//for (const auto& pos : boardNC) { // early check:
+		//	if (!pos) { continue; } // impossible to cover board after making choice
+		//}
 
 		soln.push_back(tilesidx);
-		Search(soln, newBoard, newTilesidxs);
+		Search(soln, boardNC, tilesidxsNC);
 		soln.pop_back();
+
+		MarkBoard(boardNC, choice, 0);
+		AddTiles(boardNC, tilesidxsNC, removed);
 	}
 }
 
@@ -105,14 +106,27 @@ ACX::TilesIdxs ACX::RemoveTiles(Board& board, TilesIdxs& tilesidxs, const TI col
 	return removed; // elided
 }
 
-void ACX::RemoveTiles(Board& board, TilesIdxs& tilesidxs, const Tile& choice) const
+ACX::TilesIdxs ACX::RemoveTiles(Board& board, TilesIdxs& tilesidxs, const Tile& choice) const
 {
+	TilesIdxs removed;
 	for (TI i(0); i < tilesidxs.size();) { // tiles which intersect tile and are removed
 		const auto& tilesidx(tilesidxs[i]);
 		const auto& tile(_start_tiles[tilesidx]);
 		if (!Intersect(tile, choice)) {	++i; continue;	}
+		removed.push_back(tilesidx);
 		Subtract(board, tile);
 		tilesidxs.erase(tilesidxs.begin() + i); // expensive? -> no
+	}
+	return removed; // elided
+}
+
+void ACX::AddTiles(Board& board, TilesIdxs& tilesidxs, const TilesIdxs& removed) const
+{
+	for (TI i(0); i < removed.size();) { // tiles which intersect col and were removed
+		const auto& tilesidx(tilesidxs[i]);
+		const auto& tile(_start_tiles[tilesidx]);
+		Add(board, tile);
+		tilesidxs.push_back(i);
 	}
 }
 
@@ -149,6 +163,13 @@ void ACX::Subtract(Board& board, const Tile& tile) const
 {
 	for (const auto& pos : tile) { // all positions in tile
 		--board[pos];
+	}
+}
+
+void ACX::Add(Board & board, const Tile & tile) const
+{
+	for (const auto& pos : tile) { // all positions in tile
+		++board[pos];
 	}
 }
 

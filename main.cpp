@@ -107,7 +107,7 @@ int main(int argc, char *argv[])
 		if (solverName == "dlx") { solver.reset(new DLX()); }
 		else if (solverName == "dlx2") { solver.reset(new DLX2()); }
 		else if (solverName == "dix") { solver.reset(new DIX()); }
-		else if (solverName == "acx") { solver.reset(new ACX()); }
+		else if (solverName == "acx") { solver.reset(new ACX()); } // note!: acx implementation not yet working
 		else { throw runtime_error("unknown solver: " + solverName); }
 
 		cout << "reading input from " << inputsrc << "...\n";
