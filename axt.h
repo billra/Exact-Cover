@@ -22,6 +22,9 @@ struct Tile {
 };
 
 class Tiles {
+	// Storage is pre-allocated in the constructor using Tile default constructor.
+	// We have a guarantee that memory will not move under resize reallocation
+	// as that code will not compile due to Tile's deleted copy constructor.
 	std::vector<Tile> tileStorage; // stored here but manipulated via dance
 public:
 	Tiles(const VVUI& vtile); // linkup Tiles from initialization storage
