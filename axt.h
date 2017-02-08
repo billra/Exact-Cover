@@ -4,7 +4,8 @@
 #include "Solver.h"
 #include <vector>
 
-using VVUI = std::vector<std::vector<unsigned int>>;
+using VUI = std::vector<unsigned int>;
+using VVUI = std::vector<VUI>;
 
 struct Tile {
 	Tile * prevTile; // dance Tile list
@@ -36,7 +37,7 @@ class AXT :public Solver {
 	std::function<void(Event)>Notify;
 	bool show;
 	unsigned int npc; // number of primary constraints
-	std::vector<unsigned int> constraint;
+	VUI constraint;
 	VVUI vtile;
 	decltype(vtile.end()) itCurTile;
 public:
