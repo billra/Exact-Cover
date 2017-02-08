@@ -35,6 +35,9 @@
     <ClCompile Include="..\acx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\axt.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\dlx.h">
@@ -50,6 +53,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="..\acx.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="..\axt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
