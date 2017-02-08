@@ -2,8 +2,15 @@
 // Bill Ola Rasmussen
 
 #include "Solver.h"
+#include <vector>
 
 class AXT:public Solver{
+	std::function<void(Event)>Notify;
+	bool show;
+	unsigned int npc; // number of primary constraints
+	std::vector<unsigned int> constraint;
+	std::vector<std::vector<unsigned int>> vtile;
+	decltype(vtile.end()) itCurTile;
 public:
 	AXT()=default;
 	void Init(const unsigned int pc, const unsigned int sc) override;
